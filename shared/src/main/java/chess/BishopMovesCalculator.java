@@ -9,55 +9,48 @@ public class BishopMovesCalculator implements ChessMovesCalculator {
         // this is the array list that we want to add all the moves to
         ArrayList<ChessMove> possibleMoves = new ArrayList<ChessMove>();
 
+        // array list to store different diagonal positions
+        // first number is row, second is column
+        // up right, then up left, then down left, then down right
+        int[][] directions = {{1,1},{1,-1},{-1,-1},{-1,1}};
+
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
 
         // fetching an existing piece so we don't need new keyword here
         ChessPiece actingPiece = board.getPiece(position);
 
-        // check upper right diagonal possible spots
-        for (int row = currentRow + 1, col = currentCol + 1; (row <= board.squares.length) && (col <= board.squares.length); row++, col++) {
-            ChessPosition possiblePosition = new ChessPosition(row, col);
-            ChessMove possibleMove = new ChessMove(position, possiblePosition, null);
-            possibleMoves.add(possibleMove);
-        }
+        // iterate through each of the possible directions
+        for (int i = 0; i < directions.length; i++) {
+            int rowStep = directions[i][0];
+            int colStep = directions[i][1];
 
-        // check upper left diagonal
-        for (int row = currentRow + 1, col = currentCol - 1; (row <= board.squares.length) &&  (col >= 1); row++, col--) {
-            ChessPosition possiblePos = new ChessPosition(row, col);
-            ChessMove posMove = new ChessMove(position, possiblePos, null);
-            possibleMoves.add(posMove);
-        }
+            for (int row = currentRow + rowStep,
+                     col = currentCol + colStep;
+                 (1 <= row && row <= board.squares.length) &&
+                         (1 <= col && col <= board.squares.length);
+                 row += rowStep, col += colStep) {
+                ChessPosition posPosition = new ChessPosition(row, col);
+                // we want to check if this position is a fellow teammate
+                ChessPiece pieceInWay = board.getPiece(posPosition);
+                // if it's null then we just add the position and can keep checking
+                if (pieceInWay == null) {
+                    ChessMove posMove = new ChessMove(position, posPosition, null);
 
-        // check bottom left diagonal
-        for (int row = currentRow - 1, col = currentCol-1; (row >= 1) && (col >= 1); row--, col--) {
-            ChessPosition posPosition = new ChessPosition(row, col);
-            // we want to check if this position is a fellow teammate
-            ChessPiece pieceInWay = board.getPiece(posPosition);
-            // if it's null then we just add the position and can keep checking
-            if (pieceInWay == null) {
-                ChessMove posMove = new ChessMove(position, posPosition, null);
-
-                possibleMoves.add(posMove);
+                    possibleMoves.add(posMove);
+                }
+                // it's friendly it's not valid, we break
+                else if (pieceInWay.getTeamColor() == actingPiece.getTeamColor()) {
+                    break;
+                }
+                // if it's enemy we add that as a possible move and break can it's blocking the way for the rest
+                // has to be an enemy logically
+                else {
+                    ChessMove posMove = new ChessMove(position, posPosition, null);
+                    possibleMoves.add(posMove);
+                    break;
+                }
             }
-            // it's friendly it's not valid, we break
-            else if (pieceInWay.getTeamColor() == actingPiece.getTeamColor()) {
-                break;
-            }
-            // if it's enemy we add that as a possible move and break can it's blocking the way for the rest
-            // has to be an enemy logically
-            else {
-                ChessMove posMove = new ChessMove(position, posPosition, null);
-                possibleMoves.add(posMove);
-                break;
-            }
-        }
-
-        // check bottom right diagonal
-        for (int row = currentRow - 1, col = currentCol+1; (row >= 1) && (col <= board.squares.length); row--, col++) {
-            ChessPosition posPosition = new ChessPosition(row, col);
-            ChessMove posMove = new ChessMove(position, posPosition, null);
-            possibleMoves.add(posMove);
         }
 
         return possibleMoves;
