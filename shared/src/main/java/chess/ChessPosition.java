@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.Objects;
+
 /**
  * Represents a single square position on a chess board
  * <p>
@@ -35,5 +37,25 @@ public class ChessPosition {
     @Override
     public String toString() {
         return String.format("[%d, %d]", row, col);
+    }
+
+    /*
+    IntelliJ wrote this, but I want to describe what's going on.
+    First we check if the object is null or if it's even the same class (ChessPosition)
+    Then we recast the object to ChessPosition because we know it's that class
+    Then we can check the rows and cols.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPosition that = (ChessPosition) o;
+        return row == that.row && col == that.col;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(row, col);
     }
 }
