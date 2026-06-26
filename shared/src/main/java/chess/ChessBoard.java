@@ -22,7 +22,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        // minus one so we index based on 0
+        // minus one because getRow and getCol get the actual 1 based chess position
         squares[position.getRow() - 1][position.getColumn() - 1] = piece;
     }
 
