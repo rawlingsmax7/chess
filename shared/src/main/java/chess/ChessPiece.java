@@ -60,6 +60,10 @@ public class ChessPiece {
             return bishopMoves.pieceMoves(board, myPosition);
 
         }
+        else if (piece.getPieceType() == PieceType.ROOK) {
+            RookMovesCalculator rookMoves = new RookMovesCalculator();
+            return rookMoves.pieceMoves(board, myPosition);
+        }
         // just return empty list for now while testing
         return List.of();
     }
