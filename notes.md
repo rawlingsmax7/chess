@@ -10,6 +10,8 @@ ctrl and . will allow you to import a class you're using
  - ChessMove
  - ChessPosition
 
+don't need to implement ChessGame
+
 ## Classes for Piece Types
  - PieceMovesCalculator
    - pieceMoves(board: ChessBoard, position: ChessPosition);

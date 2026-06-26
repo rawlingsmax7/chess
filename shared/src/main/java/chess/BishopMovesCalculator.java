@@ -12,6 +12,9 @@ public class BishopMovesCalculator implements ChessMovesCalculator {
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
 
+        // fetching an existing piece so we don't need new keyword here
+        ChessPiece actingPiece = board.getPiece(position);
+
         // check upper right diagonal possible spots
         for (int row = currentRow + 1, col = currentCol + 1; (row <= board.squares.length) && (col <= board.squares.length); row++, col++) {
             ChessPosition possiblePosition = new ChessPosition(row, col);
@@ -29,8 +32,25 @@ public class BishopMovesCalculator implements ChessMovesCalculator {
         // check bottom left diagonal
         for (int row = currentRow - 1, col = currentCol-1; (row >= 1) && (col >= 1); row--, col--) {
             ChessPosition posPosition = new ChessPosition(row, col);
-            ChessMove posMove = new ChessMove(position, posPosition, null);
-            possibleMoves.add(posMove);
+            // we want to check if this position is a fellow teammate
+            ChessPiece pieceInWay = board.getPiece(posPosition);
+            // if it's null then we just add the position and can keep checking
+            if (pieceInWay == null) {
+                ChessMove posMove = new ChessMove(position, posPosition, null);
+
+                possibleMoves.add(posMove);
+            }
+            // it's friendly it's not valid, we break
+            else if (pieceInWay.getTeamColor() == actingPiece.getTeamColor()) {
+                break;
+            }
+            // if it's enemy we add that as a possible move and break can it's blocking the way for the rest
+            // has to be an enemy logically
+            else {
+                ChessMove posMove = new ChessMove(position, posPosition, null);
+                possibleMoves.add(posMove);
+                break;
+            }
         }
 
         // check bottom right diagonal
