@@ -69,8 +69,12 @@ public class ChessPiece {
             return queenMoves.pieceMoves(board, myPosition);
         }
         else if (piece.getPieceType() == PieceType.KNIGHT) {
-            KnightMovesCalculator knightMOves = new KnightMovesCalculator();
-            return knightMOves.pieceMoves(board, myPosition);
+            KnightMovesCalculator knightMoves = new KnightMovesCalculator();
+            return knightMoves.pieceMoves(board, myPosition);
+        }
+        else if (piece.getPieceType() == PieceType.KING) {
+            KingMovesCalculator kingMoves = new KingMovesCalculator();
+            return kingMoves.pieceMoves(board, myPosition);
         }
         // just return empty list for now while testing
         return List.of();
