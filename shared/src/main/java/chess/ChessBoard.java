@@ -1,5 +1,11 @@
 package chess;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
+
+import static chess.ChessPiece.PieceType.*;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -42,6 +48,44 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+
+        ChessPiece.PieceType[] backRank = {ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK};
+
+        // pawns
+        for (int i = 1; i < 9; i++) {
+            ChessPosition posWhite = new ChessPosition(2, i);
+            ChessPiece pawnWhite = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+
+            ChessPosition posBlack = new ChessPosition(7, i);
+            ChessPiece pawnBlack = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+
+            addPiece(posWhite, pawnWhite);
+            addPiece(posBlack, pawnBlack);
+        }
+
+        for (int i = 1; i < 9; i++) {
+            ChessPosition posWhite = new ChessPosition(1, i);
+            ChessPiece pieceWhite = new ChessPiece(ChessGame.TeamColor.WHITE, backRank[i - 1]);
+
+            ChessPosition posBlack = new ChessPosition(8, i);
+            ChessPiece pieceBlack = new ChessPiece(ChessGame.TeamColor.BLACK, backRank[i - 1]);
+
+            addPiece(posWhite, pieceWhite);
+            addPiece(posBlack, pieceBlack);
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessBoard that = (ChessBoard) o;
+        return Objects.deepEquals(squares, that.squares);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(squares);
     }
 }
