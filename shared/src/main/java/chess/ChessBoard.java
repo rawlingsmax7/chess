@@ -1,6 +1,5 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -17,8 +16,9 @@ public class ChessBoard {
     // squares is the board object that is a multi dimensional array to hold chess pieces
     // indices for accessing this array are actually 0-7
     ChessPiece[][] squares = new ChessPiece[8][8];
+
     public ChessBoard() {
-        
+
     }
 
     /**
@@ -29,6 +29,7 @@ public class ChessBoard {
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
         // minus one because getRow and getCol get the actual 1 based chess position
+        // position is 1 based, while squares is 0 based
         squares[position.getRow() - 1][position.getColumn() - 1] = piece;
     }
 
@@ -63,6 +64,7 @@ public class ChessBoard {
             addPiece(posBlack, pawnBlack);
         }
 
+        // non pawns
         for (int i = 1; i < 9; i++) {
             ChessPosition posWhite = new ChessPosition(1, i);
             ChessPiece pieceWhite = new ChessPiece(ChessGame.TeamColor.WHITE, backRank[i - 1]);

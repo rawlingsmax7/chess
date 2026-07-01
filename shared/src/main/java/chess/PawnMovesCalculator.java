@@ -3,110 +3,117 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static chess.ChessGame.TeamColor.*;
 import static chess.ChessPiece.PieceType.*;
 
 public class PawnMovesCalculator implements ChessMovesCalculator {
 
-    private static final ChessPiece.PieceType[] promotionOptions = {ROOK, KNIGHT, BISHOP, QUEEN};
+    static final ChessPiece.PieceType[] promotionPieces = {QUEEN, BISHOP, KNIGHT, ROOK};
 
-
+    @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
+        ChessPiece actingPiece = board.getPiece(position);
+        int startingRow = position.getRow();
+        int startingCol = position.getColumn();
+
         ArrayList<ChessMove> posMoves = new ArrayList<ChessMove>();
 
-        int currentRow = position.getRow();
-        int currentCol = position.getColumn();
-
-        ChessPiece actingPiece = board.getPiece(position);
-
-
-        // get parameters depending on the color
-        int direction;
-        int startingRow;
         int promotionRow;
-        if (actingPiece.getTeamColor() == WHITE) {
-            direction = 1;
-            startingRow = 2;
+        int placementRow;
+        int direction;
+        if (actingPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
             promotionRow = 8;
-        }
-        else {
-            direction = -1;
-            startingRow = 7;
+            placementRow = 2;
+            direction = 1;
+        } else {
             promotionRow = 1;
+            placementRow = 7;
+            direction = -1;
         }
 
-        // Moving Straight
-        // first check the position right in front
-        ChessPosition position1 = new ChessPosition(currentRow + direction, currentCol);
-        ChessPiece pieceInWay1 = board.getPiece(position1);
+        // 3 cases, at the placement row (could move 1 or 2)
+        // just strolling along
+        // capturing
 
-        int row1 = position1.getRow();
-        int col1 = position1.getColumn();
+        // PLACEMENT ROW
+        if (startingRow == placementRow) {
+            // we could potentailly move 2, also we don't need to worry about boundaries
+            int row = startingRow + direction;
+            int col = startingCol; // col doesn't change
+            ChessPosition posPosition = new ChessPosition(row, col);
+            ChessPiece pieceInWay = board.getPiece(posPosition);
+            // check now if a piece is in way
+            if (pieceInWay == null) {
+                // empty space, add as potential move
+                ChessMove posMove = new ChessMove(position, posPosition, null);
+                posMoves.add(posMove);
 
-        if ((1 <= row1 && row1 <= 8) && (1 <= col1 && col1 <= 8)) {
-            boolean notBlocked = false;
-
-            if (pieceInWay1 == null) {
-                // empty; you can move there
-                addLegalOneStepPawnMove(posMoves, position, position1, promotionRow);
-
-                notBlocked = true;
-            }
-            // check if it can move two
-            if (currentRow == startingRow && notBlocked) {
-                // then if on the original row check two in front
-                ChessPosition position2 = new ChessPosition(currentRow + (2 * direction), currentCol);
-
-                ChessPiece pieceInWay2 = board.getPiece(position2);
-                // if we are in starting row then we don't need to check for bounds
+                // could also move two so check that out
+                int row2 = row + direction;
+                ChessPosition posPosition2 = new ChessPosition(row2, col);
+                ChessPiece pieceInWay2 = board.getPiece(posPosition2);
                 if (pieceInWay2 == null) {
-                    ChessMove posMove = new ChessMove(position, position2, null);
-                    posMoves.add(posMove);
+                    ChessMove posMove2 = new ChessMove(position, posPosition2, null);
+                    posMoves.add(posMove2);
+                } else {
+
                 }
+            } else {
+
             }
         }
-
-        // CAPTURING
-        int[][] posCaptureDirections = {{direction,1},{direction,-1}};
-        for (int i = 0; i < posCaptureDirections.length; i++) {
-            int rowStep = posCaptureDirections[i][0];
-            int colStep = posCaptureDirections[i][1];
-
-            ChessPosition posPosition = new ChessPosition(currentRow + rowStep, currentCol + colStep);
-            int row = posPosition.getRow();
-            int col = posPosition.getColumn();
-
-            // check bounds
+        // JUST MOVE 1 CASE
+        else {
+            int row = startingRow + direction;
+            int col = startingCol; // col doesn't change
+            // CHECK BOUNDS
             if ((1 <= row && row <= 8) && (1 <= col && col <= 8)) {
+                ChessPosition posPosition = new ChessPosition(row, col);
                 ChessPiece pieceInWay = board.getPiece(posPosition);
                 if (pieceInWay == null) {
-
-                } else if (pieceInWay.getTeamColor() == actingPiece.getTeamColor()) {
-                    // same team
-                } else {
-                    // enemy team
-                    addLegalOneStepPawnMove(posMoves, position, posPosition, promotionRow);
+                    // if it's a promote row we got to give 4 possible moves
+                    if (row == promotionRow) {
+                        for (int i = 0; i < promotionPieces.length; i++) {
+                            ChessMove posMove = new ChessMove(position, posPosition, promotionPieces[i]);
+                            posMoves.add(posMove);
+                        }
+                    } else {
+                        ChessMove posMove = new ChessMove(position, posPosition, null);
+                        posMoves.add(posMove);
+                    }
                 }
             }
+        }
+        // CAPTURING CASE
+        int[][] captureDirections = {{direction, 1}, {direction, -1}};
+
+        for (int i = 0; i < captureDirections.length; i++) {
+            int rowStep = captureDirections[i][0];
+            int colStep = captureDirections[i][1];
+
+            int row = startingRow + rowStep;
+            int col = startingCol + colStep;
+
+            if ((1 <= row && row <= 8) && (1 <= col && col <= 8)) {
+                ChessPosition posPosition = new ChessPosition(row, col);
+                ChessPiece pieceInWay = board.getPiece(posPosition);
+                // check now if a piece is in way
+                if (pieceInWay == null) {
+                } else if (pieceInWay.getTeamColor() == actingPiece.getTeamColor()) {
+                } else {
+                    if (row == promotionRow) {
+                        for (int j = 0; j < promotionPieces.length; j++) {
+                            ChessMove posMove = new ChessMove(position, posPosition, promotionPieces[j]);
+                            posMoves.add(posMove);
+                        }
+                    } else {
+                        ChessMove posMove = new ChessMove(position, posPosition, null);
+                        posMoves.add(posMove);
+                    }
+                }
+            }
+
         }
 
         return posMoves;
-    }
-
-    /*
-    A valid pawn move is registered so you just need to add depending on if it promotes or not.
-     */
-    private void addLegalOneStepPawnMove(Collection<ChessMove> possibleMoves, ChessPosition startingPos, ChessPosition endingPos, int promotionRow) {
-        int rowEnd = endingPos.getRow();
-        if (rowEnd == promotionRow) {
-            for (int j = 0; j < promotionOptions.length; j++) {
-                ChessMove posMove = new ChessMove(startingPos, endingPos, promotionOptions[j]);
-                possibleMoves.add(posMove);
-            }
-        }
-        else {
-            ChessMove posMove = new ChessMove(startingPos, endingPos, null);
-            possibleMoves.add(posMove);
-        }
     }
 }
