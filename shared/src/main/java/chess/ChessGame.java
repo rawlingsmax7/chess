@@ -10,15 +10,20 @@ import java.util.Collection;
  */
 public class ChessGame {
 
-    public ChessGame() {
+    // fields here
+    private TeamColor teamTurn;
+    private ChessBoard board = new ChessBoard();
 
+
+    public ChessGame() {
+        teamTurn = TeamColor.WHITE;
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return teamTurn;
     }
 
     /**
@@ -27,7 +32,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        teamTurn = team;
     }
 
     /**
@@ -56,7 +61,17 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        // need to get the piece at the start of the move and see where it can go
+        ChessPosition startingPos = move.getStartPosition();
+        ChessPiece actingPiece = board.getPiece(startingPos);
+
+        if (actingPiece == null) {
+            throw new InvalidMoveException();
+        } else {
+//            Collection<ChessMove> posMoves = ChessPiece.pieceMoves(board, startingPos);
+        }
+
+
     }
 
     /**
@@ -66,7 +81,63 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        // need to sweep through the whole board to find the position of the king
+        // then need to sweep through all the enemy pieces to get their potential moves
+        // add all those moves to an array
+        // see if the ending position of those moves is where the king currently is, if any match, it's in check
+
+        // start it off with not in check
+        boolean inCheck = false;
+
+        ChessPosition actingPosition = null;
+
+        // sweep through the whole board to find the position of the king
+        for (int row = 1; row < 9; row++) {
+            for (int col = 1; col < 9; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+
+                ChessPiece possibleKing = board.getPiece(position);
+
+                // if the piece is actually an empty piece then we skip
+                if (possibleKing == null) {
+                    // skip the loop if the space is empty
+                    continue;
+                }
+                // if the piece we are looking at is a king and the same teamColor this is the one we want
+                else if (possibleKing.getPieceType() == ChessPiece.PieceType.KING && possibleKing.getTeamColor() == teamColor) {
+                    actingPosition = position;
+                }
+
+            }
+        }
+
+        // now sweep the board for every enemy piece
+        for (int row = 1; row < 9; row++) {
+            for (int col = 1; col < 9; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+
+                ChessPiece possibleEnemy = board.getPiece(position);
+
+                // if the piece is actually an empty piece then we skip
+                if (possibleEnemy == null) {
+                    // skip the loop if the space is empty
+                    continue;
+                }
+                // if the piece we are looking at isn't the same team we want to get the moves of that one
+                else if (possibleEnemy.getTeamColor() != teamColor) {
+                    Collection<ChessMove> enemyMoves = possibleEnemy.pieceMoves(board, position);
+                    for (ChessMove move : enemyMoves) {
+                        ChessPosition targetedPosition = move.getEndPosition();
+                        // if the ending position of one of the moves is where the king is at then it's in check
+                        if (targetedPosition.equals(actingPosition)) {
+                            inCheck = true;
+                            return inCheck;
+                        }
+                    }
+                }
+            }
+        }
+        return inCheck;
     }
 
     /**
@@ -96,7 +167,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        board.resetBoard();
     }
 
     /**
@@ -105,6 +176,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return board;
     }
 }
