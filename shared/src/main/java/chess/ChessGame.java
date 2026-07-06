@@ -46,6 +46,14 @@ public class ChessGame {
         BLACK
     }
 
+    private void changeTeamTurn() {
+        if (teamTurn == TeamColor.WHITE) {
+            teamTurn = TeamColor.BLACK;
+        } else {
+            teamTurn = TeamColor.WHITE;
+        }
+    }
+
     /**
      * Gets all valid moves for a piece at the given location
      *
@@ -97,7 +105,13 @@ public class ChessGame {
         ChessPosition startingPos = move.getStartPosition();
         ChessPiece actingPiece = board.getPiece(startingPos);
 
+
         if (actingPiece == null) {
+            throw new InvalidMoveException();
+        }
+        // don't put these in the same if statement because we need to check
+        TeamColor actingPieceColor = actingPiece.getTeamColor();
+        if (actingPieceColor != teamTurn) {
             throw new InvalidMoveException();
         } else {
             // get the valid moves
@@ -119,6 +133,7 @@ public class ChessGame {
                 }
                 // remove the piece and change the turn
                 board.addPiece(startingPos, null);
+                changeTeamTurn();
 
             } else {
                 // validMoves doesn't contain the move so throw an InvalidMoveException
