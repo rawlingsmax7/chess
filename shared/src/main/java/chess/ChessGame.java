@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -51,7 +52,36 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        ChessPiece actingPiece = board.getPiece(startPosition);
+        if (actingPiece == null) {
+            return null;
+        }
+
+        TeamColor team = actingPiece.getTeamColor();
+
+        Collection<ChessMove> pieceMoves = actingPiece.pieceMoves(board, startPosition);
+        // got the potential moves, now need to change the board to the actual move and see if the king is in Check
+        for (ChessMove move : pieceMoves) {
+            ChessPosition endingPos = move.getEndPosition();
+
+            // need to get the piece which could be at the ending position
+            ChessPiece temporaryPiece = board.getPiece(endingPos);
+
+            // now we can add the acting piece to the endposition and make the starting part null
+            board.addPiece(endingPos, actingPiece);
+            board.addPiece(startPosition, null);
+
+            // if the team is not in check then it's a valid move; add it
+            if (!isInCheck(team)) {
+                validMoves.add(move);
+            }
+
+            // return board to original state
+            board.addPiece(endingPos, temporaryPiece);
+            board.addPiece(startPosition, actingPiece);
+        }
+        return validMoves;
     }
 
     /**
