@@ -100,10 +100,31 @@ public class ChessGame {
         if (actingPiece == null) {
             throw new InvalidMoveException();
         } else {
-//            Collection<ChessMove> posMoves = ChessPiece.pieceMoves(board, startingPos);
+            // get the valid moves
+            Collection<ChessMove> validMoves = validMoves(startingPos);
+            // need to see if the move is in validMoves
+            if (validMoves.contains(move)) {
+                // move is valid so we can perform it
+                ChessPosition endingPos = move.getEndPosition();
+
+                // if it's a promotion then we have to worry about that case
+                // if the promotionPiece part of the move is null then we don't have to worry about promotion
+                if (move.getPromotionPiece() == null) {
+                    board.addPiece(endingPos, actingPiece);
+                } else {
+                    ChessGame.TeamColor team = actingPiece.getTeamColor();
+                    ChessPiece promotedPiece = new ChessPiece(team, move.getPromotionPiece());
+                    board.addPiece(endingPos, promotedPiece);
+
+                }
+                // remove the piece and change the turn
+                board.addPiece(startingPos, null);
+
+            } else {
+                // validMoves doesn't contain the move so throw an InvalidMoveException
+                throw new InvalidMoveException();
+            }
         }
-
-
     }
 
     /**
