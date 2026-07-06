@@ -215,7 +215,33 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        return false;
+        // if the team is in check then there's no way they can be in stalemate
+        if (isInCheck(teamColor)) {
+            return false;
+        } else {
+            // sweep through board to get valid positions for each piece
+            for (int row = 1; row < 9; row++) {
+                for (int col = 1; col < 9; col++) {
+                    ChessPosition position = new ChessPosition(row, col);
+
+                    ChessPiece possiblePiece = board.getPiece(position);
+
+                    // if the board is empty there then skip it
+                    if (possiblePiece == null) {
+                        continue;
+                    }
+                    // if the board is the same team then see if we can move it
+                    else if (possiblePiece.getTeamColor() == teamColor) {
+                        Collection<ChessMove> validMoves = validMoves(position);
+                        // if a piece ever has a valid move then we aren't in stalemate so can return false
+                        if (!validMoves.isEmpty()) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
     }
 
     /**
