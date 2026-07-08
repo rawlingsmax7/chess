@@ -237,6 +237,32 @@ public class ChessGame {
         return inCheck;
     }
 
+    private boolean teamHasNoValidMoves(TeamColor teamColor) {
+        // sweep through board to get valid positions for each piece
+        for (int row = 1; row < 9; row++) {
+            for (int col = 1; col < 9; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+
+                ChessPiece possiblePiece = board.getPiece(position);
+
+                // if the board is empty there then skip it
+                if (possiblePiece == null) {
+                    continue;
+                }
+                // if the board is the same team then see if we can move it
+                else if (possiblePiece.getTeamColor() == teamColor) {
+                    Collection<ChessMove> validMoves = validMoves(position);
+                    // if a piece ever has a valid move then we aren't in checkmate so can return false
+                    if (!validMoves.isEmpty()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        // if we swept through board and there weren't any valid moves then return true
+        return true;
+    }
+
     /**
      * Determines if the given team is in checkmate
      *
