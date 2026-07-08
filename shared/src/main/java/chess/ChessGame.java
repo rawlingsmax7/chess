@@ -143,6 +143,35 @@ public class ChessGame {
     }
 
     /**
+     * Finds position of king for a certain team
+     *
+     * @param teamColor which team to check for check
+     * @return ChessPosition where king is located
+     */
+    private ChessPosition findKing(TeamColor teamColor) {
+        // sweep through the whole board to find the position of the king
+        for (int row = 1; row < 9; row++) {
+            for (int col = 1; col < 9; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+
+                ChessPiece possibleKing = board.getPiece(position);
+
+                // if the piece is actually an empty piece then we skip
+                if (possibleKing == null) {
+                    // skip the loop if the space is empty
+                    continue;
+                }
+                // if the piece we are looking at is a king and the same teamColor this is the one we want
+                else if (possibleKing.getPieceType() == ChessPiece.PieceType.KING && possibleKing.getTeamColor() == teamColor) {
+                    return position;
+                }
+            }
+        }
+        // if no king found by some odd means return null
+        return null;
+    }
+
+    /**
      * Determines if the given team is in check
      *
      * @param teamColor which team to check for check
