@@ -17,6 +17,13 @@ public class ChessGame {
     private ChessBoard board = new ChessBoard();
     private ChessPosition enPassantTarget = null; // this is where you would move your piece if you want to initiate an enPassant move
 
+    // castling fields
+    private boolean blackKingUnmoved = true;
+    private boolean whiteKingUnmoved = true;
+    private boolean blackRookUnmovedFile1 = true;
+    private boolean whiteRookUnmovedFile1 = true;
+    private boolean blackRookUnmovedFile8 = true;
+    private boolean whiteRookUnmovedFile8 = true;
 
     public ChessGame() {
         teamTurn = TeamColor.WHITE;
@@ -73,7 +80,7 @@ public class ChessGame {
 
         Collection<ChessMove> pieceMoves = actingPiece.pieceMoves(board, startPosition);
 
-        // additional movement possibility for en Passant
+        // EN PASSANT
         // if the piece is a pawn and there's an active enPassantTarget then we need to add that to the valid moves
         if (actingPiece.getPieceType() == ChessPiece.PieceType.PAWN && enPassantTarget != null) {
             int direction;
@@ -102,6 +109,182 @@ public class ChessGame {
                 pieceMoves.add(enPassantMove);
             }
         }
+
+        // CASTLING
+        // QUEENSIDE WHITE
+        if (actingPiece.getPieceType() == ChessPiece.PieceType.KING && startPosition.equals(new ChessPosition(1, 5)) && team == TeamColor.WHITE && whiteKingUnmoved && whiteRookUnmovedFile1) {
+            // king starts at (1, 5) (row 1, col 5)
+            ChessPosition pos1 = new ChessPosition(1, 4);
+            ChessPiece pieceInWay1 = board.getPiece(pos1);
+            ChessPosition pos2 = new ChessPosition(1, 3);
+            ChessPiece pieceInWay2 = board.getPiece(pos2);
+            ChessPosition pos3 = new ChessPosition(1, 2);
+            ChessPiece pieceInWay3 = board.getPiece(pos3);
+
+            if (pieceInWay1 == null && pieceInWay2 == null && pieceInWay3 == null && !isInCheck(team)) {
+
+                // need to get the piece which could be at the temp position
+                ChessPiece temporaryPiece1 = board.getPiece(pos1);
+
+                // now we can add the acting piece to the endposition and make the starting part null
+                board.addPiece(pos1, actingPiece);
+                board.addPiece(startPosition, null);
+
+                // we now are simulating position 1
+                if (!isInCheck(team)) {
+                    // clear the King we just added so there isn't more than one king
+                    board.addPiece(pos1, null);
+
+                    // need to get the piece which could be at the temp position
+                    ChessPiece temporaryPiece2 = board.getPiece(pos2);
+
+                    // now we can add the acting piece to the endposition and make the starting part null
+                    board.addPiece(pos2, actingPiece);
+                    board.addPiece(startPosition, null);
+
+                    // if we aren't in check for either of those two positions this is a valid move
+                    if (!isInCheck(team)) {
+                        ChessMove CastleKingMove = new ChessMove(startPosition, pos2, null);
+                        validMoves.add(CastleKingMove);
+                    }
+                    // return board to original state
+                    board.addPiece(pos2, temporaryPiece2);
+                    board.addPiece(startPosition, actingPiece);
+                }
+                // return board to original state
+                board.addPiece(pos1, temporaryPiece1);
+                board.addPiece(startPosition, actingPiece);
+            }
+        }
+        // KINGSIDE WHITE
+        if (actingPiece.getPieceType() == ChessPiece.PieceType.KING && startPosition.equals(new ChessPosition(1, 5)) && team == TeamColor.WHITE && whiteKingUnmoved && whiteRookUnmovedFile8) {
+            // king starts at (1, 5) (row 1, col 5)
+            ChessPosition pos1 = new ChessPosition(1, 6);
+            ChessPiece pieceInWay1 = board.getPiece(pos1);
+            ChessPosition pos2 = new ChessPosition(1, 7);
+            ChessPiece pieceInWay2 = board.getPiece(pos2);
+
+            if (pieceInWay1 == null && pieceInWay2 == null && !isInCheck(team)) {
+
+                // need to get the piece which could be at the temp position
+                ChessPiece temporaryPiece1 = board.getPiece(pos1);
+
+                // now we can add the acting piece to the endposition and make the starting part null
+                board.addPiece(pos1, actingPiece);
+                board.addPiece(startPosition, null);
+
+                // we now are simulating position 1
+                if (!isInCheck(team)) {
+                    // clear the King we just added so there isn't more than one king
+                    board.addPiece(pos1, null);
+                    // need to get the piece which could be at the temp position
+                    ChessPiece temporaryPiece2 = board.getPiece(pos2);
+
+                    // now we can add the acting piece to the endposition and make the starting part null
+                    board.addPiece(pos2, actingPiece);
+                    board.addPiece(startPosition, null);
+
+                    // if we aren't in check for either of those two positions this is a valid move
+                    if (!isInCheck(team)) {
+                        ChessMove CastleKingMove = new ChessMove(startPosition, pos2, null);
+                        validMoves.add(CastleKingMove);
+                    }
+                    // return board to original state
+                    board.addPiece(pos2, temporaryPiece2);
+                    board.addPiece(startPosition, actingPiece);
+                }
+                // return board to original state
+                board.addPiece(pos1, temporaryPiece1);
+                board.addPiece(startPosition, actingPiece);
+            }
+        }
+        // QUEENSIDE BLACK
+        if (actingPiece.getPieceType() == ChessPiece.PieceType.KING && startPosition.equals(new ChessPosition(8, 5)) && team == TeamColor.BLACK && blackKingUnmoved && blackRookUnmovedFile1) {
+            // king starts at (8, 5) (row 8, col 5)
+            ChessPosition pos1 = new ChessPosition(8, 4);
+            ChessPiece pieceInWay1 = board.getPiece(pos1);
+            ChessPosition pos2 = new ChessPosition(8, 3);
+            ChessPiece pieceInWay2 = board.getPiece(pos2);
+            ChessPosition pos3 = new ChessPosition(8, 2);
+            ChessPiece pieceInWay3 = board.getPiece(pos3);
+
+            if (pieceInWay1 == null && pieceInWay2 == null && pieceInWay3 == null && !isInCheck(team)) {
+
+                // need to get the piece which could be at the temp position
+                ChessPiece temporaryPiece1 = board.getPiece(pos1);
+
+                // now we can add the acting piece to the endposition and make the starting part null
+                board.addPiece(pos1, actingPiece);
+                board.addPiece(startPosition, null);
+
+                // we now are simulating position 1
+                if (!isInCheck(team)) {
+                    // clear the King we just added so there isn't more than one king
+                    board.addPiece(pos1, null);
+                    // need to get the piece which could be at the temp position
+                    ChessPiece temporaryPiece2 = board.getPiece(pos2);
+
+                    // now we can add the acting piece to the endposition and make the starting part null
+                    board.addPiece(pos2, actingPiece);
+                    board.addPiece(startPosition, null);
+
+                    // if we aren't in check for either of those two positions this is a valid move
+                    if (!isInCheck(team)) {
+                        ChessMove CastleKingMove = new ChessMove(startPosition, pos2, null);
+                        validMoves.add(CastleKingMove);
+                    }
+                    // return board to original state
+                    board.addPiece(pos2, temporaryPiece2);
+                    board.addPiece(startPosition, actingPiece);
+                }
+                // return board to original state
+                board.addPiece(pos1, temporaryPiece1);
+                board.addPiece(startPosition, actingPiece);
+            }
+        }
+        // KINGSIDE BLACK
+        if (actingPiece.getPieceType() == ChessPiece.PieceType.KING && startPosition.equals(new ChessPosition(8, 5)) && team == TeamColor.BLACK && blackKingUnmoved && blackRookUnmovedFile8) {
+            // king starts at (8, 5) (row 8, col 5)
+            ChessPosition pos1 = new ChessPosition(8, 6);
+            ChessPiece pieceInWay1 = board.getPiece(pos1);
+            ChessPosition pos2 = new ChessPosition(8, 7);
+            ChessPiece pieceInWay2 = board.getPiece(pos2);
+
+            if (pieceInWay1 == null && pieceInWay2 == null && !isInCheck(team)) {
+
+                // need to get the piece which could be at the temp position
+                ChessPiece temporaryPiece1 = board.getPiece(pos1);
+
+                // now we can add the acting piece to the endposition and make the starting part null
+                board.addPiece(pos1, actingPiece);
+                board.addPiece(startPosition, null);
+
+                // we now are simulating position 1
+                if (!isInCheck(team)) {
+                    // clear the King we just added so there isn't more than one king
+                    board.addPiece(pos1, null);
+                    // need to get the piece which could be at the temp position
+                    ChessPiece temporaryPiece2 = board.getPiece(pos2);
+
+                    // now we can add the acting piece to the endposition and make the starting part null
+                    board.addPiece(pos2, actingPiece);
+                    board.addPiece(startPosition, null);
+
+                    // if we aren't in check for either of those two positions this is a valid move
+                    if (!isInCheck(team)) {
+                        ChessMove CastleKingMove = new ChessMove(startPosition, pos2, null);
+                        validMoves.add(CastleKingMove);
+                    }
+                    // return board to original state
+                    board.addPiece(pos2, temporaryPiece2);
+                    board.addPiece(startPosition, actingPiece);
+                }
+                // return board to original state
+                board.addPiece(pos1, temporaryPiece1);
+                board.addPiece(startPosition, actingPiece);
+            }
+        }
+
 
         // simulate the moves
         // got the potential moves, now need to change the board to the actual move and see if the king is in Check
@@ -188,8 +371,30 @@ public class ChessGame {
                 }
                 // remove the piece and change the turn
                 board.addPiece(startingPos, null);
-                changeTeamTurn();
 
+                // CASTLING
+                int colDifference = endingPos.getColumn() - startingPos.getColumn(); // if this is positive then it's kingside castling
+                // the above code moves the king, but we also then need to move the rook
+                if (actingPiece.getPieceType() == ChessPiece.PieceType.KING && 2 == (Math.abs(startingPos.getColumn() - endingPos.getColumn()))) {
+                    if (colDifference > 0 && actingPieceColor == TeamColor.WHITE) {
+                        // WHITE KINGSIDE
+                        board.addPiece(new ChessPosition(1, 6), new ChessPiece(actingPieceColor, ChessPiece.PieceType.ROOK));
+                        board.addPiece(new ChessPosition(1, 8), null);
+                    } else if (colDifference < 0 && actingPieceColor == TeamColor.WHITE) {
+                        // WHITE QUEENSIDE
+                        board.addPiece(new ChessPosition(1, 4), new ChessPiece(actingPieceColor, ChessPiece.PieceType.ROOK));
+                        board.addPiece(new ChessPosition(1, 1), null);
+                    } else if (colDifference > 0 && actingPieceColor == TeamColor.BLACK) {
+                        // BLACK KINGSIDE
+                        board.addPiece(new ChessPosition(8, 6), new ChessPiece(actingPieceColor, ChessPiece.PieceType.ROOK));
+                        board.addPiece(new ChessPosition(8, 8), null);
+                    } else if (colDifference < 0 && actingPieceColor == TeamColor.BLACK) {
+                        // BLACK QUEENSIDE
+                        board.addPiece(new ChessPosition(8, 4), new ChessPiece(actingPieceColor, ChessPiece.PieceType.ROOK));
+                        board.addPiece(new ChessPosition(8, 1), null);
+                    }
+                }
+                changeTeamTurn();
             } else {
                 // validMoves doesn't contain the move so throw an InvalidMoveException
                 throw new InvalidMoveException();
@@ -206,6 +411,30 @@ public class ChessGame {
         } else {
             enPassantTarget = null;
         }
+
+        // CASTLING
+        // check if there was a king or rook move that then made castling invalid for a team
+        // KINGS
+        if (actingPiece.getPieceType() == ChessPiece.PieceType.KING && actingPieceColor == TeamColor.WHITE) {
+            whiteKingUnmoved = false;
+        }
+        if (actingPiece.getPieceType() == ChessPiece.PieceType.KING && actingPieceColor == TeamColor.BLACK) {
+            blackKingUnmoved = false;
+        }
+        if (actingPiece.getPieceType() == ChessPiece.PieceType.ROOK && actingPieceColor == TeamColor.WHITE && startingPos.getColumn() == 1) {
+            whiteRookUnmovedFile1 = false;
+        }
+        if (actingPiece.getPieceType() == ChessPiece.PieceType.ROOK && actingPieceColor == TeamColor.BLACK && startingPos.getColumn() == 1) {
+            blackRookUnmovedFile1 = false;
+        }
+        if (actingPiece.getPieceType() == ChessPiece.PieceType.ROOK && actingPieceColor == TeamColor.WHITE && startingPos.getColumn() == 8) {
+            whiteRookUnmovedFile8 = false;
+        }
+        if (actingPiece.getPieceType() == ChessPiece.PieceType.ROOK && actingPieceColor == TeamColor.BLACK && startingPos.getColumn() == 8) {
+            blackRookUnmovedFile8 = false;
+        }
+
+
     }
 
     /**
