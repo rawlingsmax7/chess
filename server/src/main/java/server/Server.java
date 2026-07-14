@@ -1,10 +1,13 @@
 package server;
 
-import dataaccess.MemoryAuthTokenDao;
-import dataaccess.MemoryGameDao;
-import dataaccess.MemoryUserDao;
+import com.google.gson.Gson;
+import dataaccess.*;
 import io.javalin.Javalin;
+import requests.ErrorResult;
+import requests.RegisterRequest;
+import requests.RegisterResult;
 import service.ClearService;
+import service.UserService;
 
 public class Server {
 
@@ -19,10 +22,28 @@ public class Server {
         MemoryAuthTokenDao authDao = new MemoryAuthTokenDao();
 
         ClearService clearService = new ClearService(userDao, gameDao, authDao);
+        UserService userService = new UserService(userDao, authDao);
 
+        Gson gson = new Gson();
+
+        // exception handlers
+        javalin.exception(BadRequestException.class, (exception, ctx) -> ctx.status(400).result(gson.toJson(new ErrorResult(exception.getMessage()))));
+        javalin.exception(UnauthorizedException.class, (exception, ctx) -> ctx.status(401).result(gson.toJson(new ErrorResult(exception.getMessage()))));
+        javalin.exception(AlreadyTakenException.class, (exception, ctx) -> ctx.status(403).result(gson.toJson(new ErrorResult(exception.getMessage()))));
+        javalin.exception(Exception.class, (exception, ctx) -> ctx.status(500).result(gson.toJson(new ErrorResult("Error: " + exception.getMessage()))));
+
+        // clear endpoint
         javalin.delete("/db", ctx -> {
             clearService.clear();
             ctx.status(200).result("{}");
+        });
+
+        // register endpoint
+        javalin.post("/user", ctx -> {
+            // ctx.body() is the raw JSON the client sent
+            RegisterRequest request = gson.fromJson(ctx.body(), RegisterRequest.class);
+            RegisterResult result = userService.register(request);
+            ctx.result(gson.toJson(result));
         });
     }
 
