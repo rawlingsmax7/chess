@@ -4,8 +4,7 @@ import dataaccess.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import requests.RegisterRequest;
-import requests.RegisterResult;
+import requests.*;
 
 public class UserServiceTest {
     private UserService userService;
@@ -36,5 +35,54 @@ public class UserServiceTest {
 
         RegisterRequest nextRequest = new RegisterRequest("Max", "password", "max@gmail.com");
         Assertions.assertThrows(AlreadyTakenException.class, () -> userService.register(nextRequest));
+    }
+
+    // positive test for login
+    @Test
+    public void loginSuccess() throws DataAccessException {
+        // register a user first
+        RegisterRequest registerRequest = new RegisterRequest("Max", "password", "max@gmail.com");
+        userService.register(registerRequest);
+
+        // create and perform the login request
+        LoginRequest loginRequest = new LoginRequest("Max", "password");
+        LoginResult result = userService.login(loginRequest);
+
+        Assertions.assertEquals("Max", result.username());
+        Assertions.assertNotNull(result.authToken());
+    }
+
+    // negative test for login
+    // we try to login with a username that doesn't exist yet
+    @Test
+    public void loginFailure() throws DataAccessException {
+        // create and perform the login request
+        LoginRequest loginRequest = new LoginRequest("Max", "password");
+        Assertions.assertThrows(UnauthorizedException.class, () -> userService.login(loginRequest));
+    }
+
+    // positive test for logout
+    @Test
+    public void logoutSuccess() throws DataAccessException {
+        // register a user first
+        RegisterRequest registerRequest = new RegisterRequest("Max", "password", "max@gmail.com");
+        userService.register(registerRequest);
+        // login user
+        LoginRequest loginRequest = new LoginRequest("Max", "password");
+        LoginResult loginResult = userService.login(loginRequest);
+        // logout user
+        LogoutRequest logoutRequest = new LogoutRequest(loginResult.authToken());
+        userService.logout(logoutRequest);
+
+        // logging out the user deletes the authData so logging out again should fail
+        Assertions.assertThrows(UnauthorizedException.class, () -> userService.logout(logoutRequest));
+    }
+
+    // negative test for logout
+    // logout with an invalid token
+    @Test
+    public void logoutFailure() throws DataAccessException {
+        LogoutRequest logoutRequest = new LogoutRequest("fake token");
+        Assertions.assertThrows(UnauthorizedException.class, () -> userService.logout(logoutRequest));
     }
 }
