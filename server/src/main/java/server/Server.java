@@ -3,9 +3,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.*;
 import io.javalin.Javalin;
-import requests.ErrorResult;
-import requests.RegisterRequest;
-import requests.RegisterResult;
+import requests.*;
 import service.ClearService;
 import service.UserService;
 
@@ -43,6 +41,13 @@ public class Server {
             // ctx.body() is the raw JSON the client sent
             RegisterRequest request = gson.fromJson(ctx.body(), RegisterRequest.class);
             RegisterResult result = userService.register(request);
+            ctx.result(gson.toJson(result));
+        });
+
+        // login endpoint
+        javalin.post("/session", ctx -> {
+            LoginRequest request = gson.fromJson(ctx.body(), LoginRequest.class);
+            LoginResult result = userService.login(request);
             ctx.result(gson.toJson(result));
         });
     }
