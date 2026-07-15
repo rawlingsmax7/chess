@@ -50,6 +50,15 @@ public class Server {
             LoginResult result = userService.login(request);
             ctx.result(gson.toJson(result));
         });
+
+        // logout endpoint
+        javalin.delete("/session", ctx -> {
+            // the authToken is in a header, not a body this time
+            String authToken = ctx.header("authorization");
+            LogoutRequest request = new LogoutRequest(authToken);
+            LogoutResult result = userService.logout(request);
+            ctx.result(gson.toJson(result));
+        });
     }
 
     public int run(int desiredPort) {

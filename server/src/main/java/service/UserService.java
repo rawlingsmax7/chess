@@ -3,10 +3,7 @@ package service;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
-import requests.LoginRequest;
-import requests.LoginResult;
-import requests.RegisterRequest;
-import requests.RegisterResult;
+import requests.*;
 
 import java.util.UUID;
 
@@ -48,6 +45,7 @@ public class UserService {
     public LoginResult login(LoginRequest request) throws DataAccessException {
         String username = request.username();
         String password = request.password();
+        // make sure the data in the request is good
         if (username == null || password == null) {
             throw new BadRequestException("Error: bad request");
         }
@@ -61,5 +59,23 @@ public class UserService {
         authDao.storeAuth(auth);
 
         return new LoginResult(username, auth.authToken());
+    }
+
+    public LogoutResult logout(LogoutRequest request) throws DataAccessException {
+        String authToken = request.authToken();
+        // make sure the data in the request is good
+        if (authToken == null) {
+            throw new BadRequestException("Error: bad request");
+        }
+
+        AuthData authData = authDao.getAuth(authToken);
+        // make sure that the authentication data requested to delete actually exists; if not throw an exception
+        if (authData == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+
+        authDao.deleteAuth(authData);
+
+        return new LogoutResult();
     }
 }
