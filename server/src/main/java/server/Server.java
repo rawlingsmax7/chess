@@ -5,6 +5,7 @@ import dataaccess.*;
 import io.javalin.Javalin;
 import requests.*;
 import service.ClearService;
+import service.GameService;
 import service.UserService;
 
 public class Server {
@@ -21,6 +22,7 @@ public class Server {
 
         ClearService clearService = new ClearService(userDao, gameDao, authDao);
         UserService userService = new UserService(userDao, authDao);
+        GameService gameService = new GameService(gameDao, authDao);
 
         Gson gson = new Gson();
 
@@ -57,6 +59,14 @@ public class Server {
             String authToken = ctx.header("authorization");
             LogoutRequest request = new LogoutRequest(authToken);
             LogoutResult result = userService.logout(request);
+            ctx.result(gson.toJson(result));
+        });
+
+        // create game endpoint
+        javalin.post("/game", ctx -> {
+            String authToken = ctx.header("authorization");
+            CreateRequest request = gson.fromJson(ctx.body(), CreateRequest.class);
+            CreateResult result = gameService.createGame(authToken, request);
             ctx.result(gson.toJson(result));
         });
     }
