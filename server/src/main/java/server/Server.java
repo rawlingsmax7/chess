@@ -69,6 +69,22 @@ public class Server {
             CreateResult result = gameService.createGame(authToken, request);
             ctx.result(gson.toJson(result));
         });
+
+        // list games endpoint
+        javalin.get("/game", ctx -> {
+            String authToken = ctx.header("authorization");
+            // don't need a request here because I can just pass the header authToken in
+            ListResult result = gameService.listGames(authToken);
+            ctx.result(gson.toJson(result));
+        });
+
+        // join game endpoint
+        javalin.put("/game", ctx -> {
+            String authToken = ctx.header("authorization");
+            JoinRequest request = gson.fromJson(ctx.body(), JoinRequest.class);
+            JoinResult result = gameService.joinGame(authToken, request);
+            ctx.result(gson.toJson(result));
+        });
     }
 
     public int run(int desiredPort) {
