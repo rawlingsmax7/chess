@@ -41,7 +41,6 @@ public class KnightMovesCalculator implements ChessMovesCalculator {
                 }
             }
         }
-
         return posMoves;
     }
 }

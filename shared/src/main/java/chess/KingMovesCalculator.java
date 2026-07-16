@@ -23,7 +23,7 @@ public class KingMovesCalculator implements ChessMovesCalculator {
             int row = posPosition.getRow();
             int col = posPosition.getColumn();
 
-            if ((1 <= row && row <= 8) && (1 <= col && col <= 8)) {
+            if (board.isInBounds(row, col)) {
 
                 ChessPiece pieceInWay = board.getPiece(posPosition);
 
