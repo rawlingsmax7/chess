@@ -359,35 +359,32 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         // need to sweep through the whole board to find the position of the king
-        // then need to sweep through all the enemy pieces to get their potential moves
-        // add all those moves to an array
-        // see if the ending position of those moves is where the king currently is, if any match, it's in check
-
         ChessPosition actingPosition = findKing(teamColor);
 
-        // now sweep the board for every enemy piece
+        // then need to sweep through all the enemy pieces to get their potential moves
+        // add all those moves to an array
         for (int row = 1; row < 9; row++) {
             for (int col = 1; col < 9; col++) {
                 ChessPosition position = new ChessPosition(row, col);
-
                 ChessPiece possibleEnemy = board.getPiece(position);
 
-                // if the piece is actually an empty piece then we skip
-                if (possibleEnemy == null) {
-                    // skip the loop if the space is empty
-                    continue;
+                // see if the ending position of those moves is where the king currently is, if any match, it's in check
+                // an enemy piece that can move onto the king's square means we're in check
+                if (possibleEnemy != null && possibleEnemy.getTeamColor() != teamColor
+                        && attacksPosition(possibleEnemy, position, actingPosition)) {
+                    return true;
                 }
-                // if the piece we are looking at isn't the same team we want to get the moves of that one
-                else if (possibleEnemy.getTeamColor() != teamColor) {
-                    Collection<ChessMove> enemyMoves = possibleEnemy.pieceMoves(board, position);
-                    for (ChessMove move : enemyMoves) {
-                        ChessPosition targetedPosition = move.getEndPosition();
-                        // if the ending position of one of the moves is where the king is at then it's in check
-                        if (targetedPosition.equals(actingPosition)) {
-                            return true;
-                        }
-                    }
-                }
+            }
+        }
+        return false;
+    }
+
+    // returns if the piece at source has a move that is attacking the targetedPosition
+    private boolean attacksPosition(ChessPiece piece, ChessPosition source,
+                                    ChessPosition targetedPosition) {
+        for (ChessMove move : piece.pieceMoves(board, source)) {
+            if (move.getEndPosition().equals(targetedPosition)) {
+                return true;
             }
         }
         return false;
