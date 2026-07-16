@@ -7,7 +7,7 @@ import static chess.ChessPiece.PieceType.*;
 
 public class PawnMovesCalculator implements ChessMovesCalculator {
 
-    static final ChessPiece.PieceType[] promotionPieces = {QUEEN, BISHOP, KNIGHT, ROOK};
+    static final ChessPiece.PieceType[] PROMOTION_PIECES = {QUEEN, BISHOP, KNIGHT, ROOK};
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
@@ -15,7 +15,7 @@ public class PawnMovesCalculator implements ChessMovesCalculator {
         int startingRow = position.getRow();
         int startingCol = position.getColumn();
 
-        ArrayList<ChessMove> posMoves = new ArrayList<ChessMove>();
+        ArrayList<ChessMove> posMoves = new ArrayList<>();
 
         int promotionRow;
         int placementRow;
@@ -30,90 +30,51 @@ public class PawnMovesCalculator implements ChessMovesCalculator {
             direction = -1;
         }
 
-        // 3 cases, at the placement row (could move 1 or 2)
-        // just strolling along
-        // capturing
+        // 3 cases: strolling forward one, moving two from the placement row, and capturing
 
-        // PLACEMENT ROW
-        if (startingRow == placementRow) {
-            // we could potentailly move 2, also we don't need to worry about boundaries
-            int row = startingRow + direction;
-            int col = startingCol; // col doesn't change
-            ChessPosition posPosition = new ChessPosition(row, col);
-            ChessPiece pieceInWay = board.getPiece(posPosition);
-            // check now if a piece is in way
-            if (pieceInWay == null) {
-                // empty space, add as potential move
-                ChessMove posMove = new ChessMove(position, posPosition, null);
-                posMoves.add(posMove);
+        // JUST MOVE 1 CASE (col doesn't change, only onto an empty space)
+        int forwardRow = startingRow + direction;
+        ChessPosition posPosition = new ChessPosition(forwardRow, startingCol);
+        if (board.isInBounds(forwardRow, startingCol) && board.getPiece(posPosition) == null) {
+            // if it's a promote row we got to give 4 possible moves, else just the one
+            addPawnMove(posMoves, position, posPosition, forwardRow, promotionRow);
 
-                // could also move two so check that out
-                int row2 = row + direction;
-                ChessPosition posPosition2 = new ChessPosition(row2, col);
-                ChessPiece pieceInWay2 = board.getPiece(posPosition2);
-                if (pieceInWay2 == null) {
-                    ChessMove posMove2 = new ChessMove(position, posPosition2, null);
-                    posMoves.add(posMove2);
-                } else {
-
-                }
-            } else {
-
+            // could also move two if we're on the placement row and that space is open too
+            ChessPosition posPosition2 = new ChessPosition(forwardRow + direction, startingCol);
+            if (startingRow == placementRow && board.getPiece(posPosition2) == null) {
+                posMoves.add(new ChessMove(position, posPosition2, null));
             }
         }
-        // JUST MOVE 1 CASE
-        else {
-            int row = startingRow + direction;
-            int col = startingCol; // col doesn't change
-            // CHECK BOUNDS
-            if (board.isInBounds(row, col)) {
-                ChessPosition posPosition = new ChessPosition(row, col);
-                ChessPiece pieceInWay = board.getPiece(posPosition);
-                if (pieceInWay == null) {
-                    // if it's a promote row we got to give 4 possible moves
-                    if (row == promotionRow) {
-                        for (int i = 0; i < promotionPieces.length; i++) {
-                            ChessMove posMove = new ChessMove(position, posPosition, promotionPieces[i]);
-                            posMoves.add(posMove);
-                        }
-                    } else {
-                        ChessMove posMove = new ChessMove(position, posPosition, null);
-                        posMoves.add(posMove);
-                    }
-                }
-            }
-        }
-        // CAPTURING CASE
+
+        // CAPTURING CASE (diagonals, only onto an enemy piece)
         int[][] captureDirections = {{direction, 1}, {direction, -1}};
-
-        for (int i = 0; i < captureDirections.length; i++) {
-            int rowStep = captureDirections[i][0];
-            int colStep = captureDirections[i][1];
-
-            int row = startingRow + rowStep;
-            int col = startingCol + colStep;
-
-            if (board.isInBounds(row, col)) {
-                ChessPosition posPosition = new ChessPosition(row, col);
-                ChessPiece pieceInWay = board.getPiece(posPosition);
-                // check now if a piece is in way
-                if (pieceInWay == null) {
-                } else if (pieceInWay.getTeamColor() == actingPiece.getTeamColor()) {
-                } else {
-                    if (row == promotionRow) {
-                        for (int j = 0; j < promotionPieces.length; j++) {
-                            ChessMove posMove = new ChessMove(position, posPosition, promotionPieces[j]);
-                            posMoves.add(posMove);
-                        }
-                    } else {
-                        ChessMove posMove = new ChessMove(position, posPosition, null);
-                        posMoves.add(posMove);
-                    }
-                }
+        for (int[] captureDirection : captureDirections) {
+            int row = startingRow + captureDirection[0];
+            int col = startingCol + captureDirection[1];
+            // CHECK BOUNDS
+            if (!board.isInBounds(row, col)) {
+                continue;
             }
-
+            ChessPosition capturePosition = new ChessPosition(row, col);
+            // check now if a piece is in the way, and that it's an enemy we can take
+            ChessPiece pieceInWay = board.getPiece(capturePosition);
+            if (pieceInWay != null && pieceInWay.getTeamColor() != actingPiece.getTeamColor()) {
+                addPawnMove(posMoves, position, capturePosition, row, promotionRow);
+            }
         }
 
         return posMoves;
+    }
+
+    // adds a pawn move, expanding into the 4 promotion moves when it reaches the promotion row
+    private void addPawnMove(Collection<ChessMove> moves, ChessPosition from,
+                             ChessPosition to, int row, int promotionRow) {
+        if (row == promotionRow) {
+            for (ChessPiece.PieceType promotion : PROMOTION_PIECES) {
+                moves.add(new ChessMove(from, to, promotion));
+            }
+        } else {
+            moves.add(new ChessMove(from, to, null));
+        }
     }
 }

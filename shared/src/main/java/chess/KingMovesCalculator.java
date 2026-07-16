@@ -1,48 +1,11 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
-public class KingMovesCalculator implements ChessMovesCalculator {
+public class KingMovesCalculator extends StepMovesCalculator {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
-        ArrayList<ChessMove> posMoves = new ArrayList<ChessMove>();
+        int[][] directions = {{0, 1}, {1, 0}, {-1, 0}, {0, -1}, {1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
 
-        int[][] posDirections = {{0, 1}, {1, 0}, {-1, 0}, {0, -1}, {1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
-
-        int currentRow = position.getRow();
-        int currentCol = position.getColumn();
-
-        ChessPiece actingPiece = board.getPiece(position);
-
-        for (int i = 0; i < posDirections.length; i++) {
-            int rowStep = posDirections[i][0];
-            int colStep = posDirections[i][1];
-
-            ChessPosition posPosition = new ChessPosition(currentRow + rowStep, currentCol + colStep);
-
-            int row = posPosition.getRow();
-            int col = posPosition.getColumn();
-
-            if (board.isInBounds(row, col)) {
-
-                ChessPiece pieceInWay = board.getPiece(posPosition);
-
-                if (pieceInWay == null) {
-                    // empty spot
-                    ChessMove posMove = new ChessMove(position, posPosition, null);
-                    posMoves.add(posMove);
-
-                } else if (pieceInWay.getTeamColor() == actingPiece.getTeamColor()) {
-                    // same team
-                } else {
-                    // enemy team
-                    ChessMove posMove = new ChessMove(position, posPosition, null);
-                    posMoves.add(posMove);
-                }
-            }
-        }
-
-        return posMoves;
-
+        return stepMove(board, position, directions);
     }
 }

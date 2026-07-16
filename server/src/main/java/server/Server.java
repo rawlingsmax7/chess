@@ -27,10 +27,14 @@ public class Server {
         Gson gson = new Gson();
 
         // exception handlers
-        javalin.exception(BadRequestException.class, (exception, ctx) -> ctx.status(400).result(gson.toJson(new ErrorResult(exception.getMessage()))));
-        javalin.exception(UnauthorizedException.class, (exception, ctx) -> ctx.status(401).result(gson.toJson(new ErrorResult(exception.getMessage()))));
-        javalin.exception(AlreadyTakenException.class, (exception, ctx) -> ctx.status(403).result(gson.toJson(new ErrorResult(exception.getMessage()))));
-        javalin.exception(Exception.class, (exception, ctx) -> ctx.status(500).result(gson.toJson(new ErrorResult("Error: " + exception.getMessage()))));
+        javalin.exception(BadRequestException.class, (exception, ctx) ->
+                ctx.status(400).result(gson.toJson(new ErrorResult(exception.getMessage()))));
+        javalin.exception(UnauthorizedException.class, (exception, ctx) ->
+                ctx.status(401).result(gson.toJson(new ErrorResult(exception.getMessage()))));
+        javalin.exception(AlreadyTakenException.class, (exception, ctx) ->
+                ctx.status(403).result(gson.toJson(new ErrorResult(exception.getMessage()))));
+        javalin.exception(Exception.class, (exception, ctx) ->
+                ctx.status(500).result(gson.toJson(new ErrorResult("Error: " + exception.getMessage()))));
 
         // clear endpoint
         javalin.delete("/db", ctx -> {

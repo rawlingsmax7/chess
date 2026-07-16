@@ -215,26 +215,13 @@ public class ChessGame {
                 board.addPiece(startingPos, null);
 
                 // CASTLING
-                int colDifference = endingPos.getColumn() - startingPos.getColumn(); // if this is positive then it's kingside castling
-                // the above code moves the king, but we also then need to move the rook
-                if (actingPiece.getPieceType() == ChessPiece.PieceType.KING && 2 == (Math.abs(startingPos.getColumn() - endingPos.getColumn()))) {
-                    if (colDifference > 0 && actingPieceColor == TeamColor.WHITE) {
-                        // WHITE KINGSIDE
-                        board.addPiece(new ChessPosition(1, 6), new ChessPiece(actingPieceColor, ChessPiece.PieceType.ROOK));
-                        board.addPiece(new ChessPosition(1, 8), null);
-                    } else if (colDifference < 0 && actingPieceColor == TeamColor.WHITE) {
-                        // WHITE QUEENSIDE
-                        board.addPiece(new ChessPosition(1, 4), new ChessPiece(actingPieceColor, ChessPiece.PieceType.ROOK));
-                        board.addPiece(new ChessPosition(1, 1), null);
-                    } else if (colDifference > 0 && actingPieceColor == TeamColor.BLACK) {
-                        // BLACK KINGSIDE
-                        board.addPiece(new ChessPosition(8, 6), new ChessPiece(actingPieceColor, ChessPiece.PieceType.ROOK));
-                        board.addPiece(new ChessPosition(8, 8), null);
-                    } else if (colDifference < 0 && actingPieceColor == TeamColor.BLACK) {
-                        // BLACK QUEENSIDE
-                        board.addPiece(new ChessPosition(8, 4), new ChessPiece(actingPieceColor, ChessPiece.PieceType.ROOK));
-                        board.addPiece(new ChessPosition(8, 1), null);
-                    }
+                // the king moved above, but we also have to move the rook when we castle
+                // if colDifference positive then it's a kingside castle
+                // if it's negative then it's a queenside castle
+                int colDifference = endingPos.getColumn() - startingPos.getColumn();
+                if (actingPiece.getPieceType() == ChessPiece.PieceType.KING
+                        && Math.abs(colDifference) == 2) {
+                    moveCastlingRook(actingPieceColor, colDifference);
                 }
                 changeTeamTurn();
             } else {
@@ -243,40 +230,60 @@ public class ChessGame {
             }
         }
 
-        // check if the move that happened was a pawn and it was a 2 row move; if so then there is now an enPassantTarget
+        // check if the move was a pawn 2 row move; if so then there is now an enPassantTarget
         ChessPosition endingPos = move.getEndPosition();
-        int row_difference = Math.abs(startingPos.getRow() - endingPos.getRow());
+        int rowDifference = Math.abs(startingPos.getRow() - endingPos.getRow());
 
         int enPassantRow = (startingPos.getRow() + endingPos.getRow()) / 2;
-        if (actingPiece.getPieceType() == ChessPiece.PieceType.PAWN && row_difference == 2) {
+        if (actingPiece.getPieceType() == ChessPiece.PieceType.PAWN && rowDifference == 2) {
             enPassantTarget = new ChessPosition(enPassantRow, startingPos.getColumn());
         } else {
             enPassantTarget = null;
         }
 
         // CASTLING
-        // check if there was a king or rook move that then made castling invalid for a team
-        // KINGS
-        if (actingPiece.getPieceType() == ChessPiece.PieceType.KING && actingPieceColor == TeamColor.WHITE) {
-            whiteKingUnmoved = false;
+        // a king or rook move can make castling invalid for a team
+        updateCastlingRights(actingPiece, actingPieceColor, startingPos);
+    }
+
+    // this moves the rook to the other side of the king when the king castles
+    private void moveCastlingRook(TeamColor color, int colDifference) {
+        int row = (color == TeamColor.WHITE) ? 1 : 8;
+        ChessPiece rook = new ChessPiece(color, ChessPiece.PieceType.ROOK);
+        if (colDifference > 0) {
+            // KINGSIDE
+            board.addPiece(new ChessPosition(row, 6), rook);
+            board.addPiece(new ChessPosition(row, 8), null);
+        } else {
+            // QUEENSIDE
+            board.addPiece(new ChessPosition(row, 4), rook);
+            board.addPiece(new ChessPosition(row, 1), null);
         }
-        if (actingPiece.getPieceType() == ChessPiece.PieceType.KING && actingPieceColor == TeamColor.BLACK) {
-            blackKingUnmoved = false;
+    }
+
+    // once a king or rook moves off its start square, that color then  loses the ability to castle
+    private void updateCastlingRights(ChessPiece actingPiece, TeamColor color, ChessPosition startingPos) {
+        ChessPiece.PieceType type = actingPiece.getPieceType();
+        int startCol = startingPos.getColumn();
+        if (type == ChessPiece.PieceType.KING) {
+            if (color == TeamColor.WHITE) {
+                whiteKingUnmoved = false;
+            } else {
+                blackKingUnmoved = false;
+            }
         }
-        if (actingPiece.getPieceType() == ChessPiece.PieceType.ROOK && actingPieceColor == TeamColor.WHITE && startingPos.getColumn() == 1) {
+        if (type == ChessPiece.PieceType.ROOK && color == TeamColor.WHITE && startCol == 1) {
             whiteRookUnmovedFile1 = false;
         }
-        if (actingPiece.getPieceType() == ChessPiece.PieceType.ROOK && actingPieceColor == TeamColor.BLACK && startingPos.getColumn() == 1) {
+        if (type == ChessPiece.PieceType.ROOK && color == TeamColor.BLACK && startCol == 1) {
             blackRookUnmovedFile1 = false;
         }
-        if (actingPiece.getPieceType() == ChessPiece.PieceType.ROOK && actingPieceColor == TeamColor.WHITE && startingPos.getColumn() == 8) {
+        if (type == ChessPiece.PieceType.ROOK && color == TeamColor.WHITE && startCol == 8) {
             whiteRookUnmovedFile8 = false;
         }
-        if (actingPiece.getPieceType() == ChessPiece.PieceType.ROOK && actingPieceColor == TeamColor.BLACK && startingPos.getColumn() == 8) {
+        if (type == ChessPiece.PieceType.ROOK && color == TeamColor.BLACK && startCol == 8) {
             blackRookUnmovedFile8 = false;
         }
-
-
     }
 
     private void addCastleMove(TeamColor team, boolean canCastle, int row, int[] emptyCols,
@@ -301,7 +308,7 @@ public class ChessGame {
             board.addPiece(position, king);
             board.addPiece(kingStart, null);
             boolean crossedCheck = isInCheck(team);
-            
+
 
             board.addPiece(position, null);
             board.addPiece(kingStart, king);
