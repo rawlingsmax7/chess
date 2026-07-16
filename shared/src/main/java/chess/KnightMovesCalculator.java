@@ -3,11 +3,11 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class KnightMovesCalculator  implements ChessMovesCalculator {
+public class KnightMovesCalculator implements ChessMovesCalculator {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
         ArrayList<ChessMove> posMoves = new ArrayList<ChessMove>();
 
-        int[][] posDirections = {{1,2},{-1,2},{2,1},{2,-1},{1,-2},{-1,-2},{-2,1},{-2,-1}};
+        int[][] posDirections = {{1, 2}, {-1, 2}, {2, 1}, {2, -1}, {1, -2}, {-1, -2}, {-2, 1}, {-2, -1}};
 
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
@@ -32,11 +32,9 @@ public class KnightMovesCalculator  implements ChessMovesCalculator {
                     ChessMove posMove = new ChessMove(position, posPosition, null);
                     posMoves.add(posMove);
 
-                }
-                else if (pieceInWay.getTeamColor() == actingPiece.getTeamColor()) {
+                } else if (pieceInWay.getTeamColor() == actingPiece.getTeamColor()) {
                     // same team
-                }
-                else {
+                } else {
                     // enemy team
                     ChessMove posMove = new ChessMove(position, posPosition, null);
                     posMoves.add(posMove);

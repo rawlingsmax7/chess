@@ -1,7 +1,6 @@
 package chess;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -74,20 +73,16 @@ public class ChessPiece {
             BishopMovesCalculator bishopMoves = new BishopMovesCalculator();
             return bishopMoves.pieceMoves(board, myPosition);
 
-        }
-        else if (piece.getPieceType() == PieceType.ROOK) {
+        } else if (piece.getPieceType() == PieceType.ROOK) {
             RookMovesCalculator rookMoves = new RookMovesCalculator();
             return rookMoves.pieceMoves(board, myPosition);
-        }
-        else if (piece.getPieceType() == PieceType.QUEEN) {
+        } else if (piece.getPieceType() == PieceType.QUEEN) {
             QueenMovesCalculator queenMoves = new QueenMovesCalculator();
             return queenMoves.pieceMoves(board, myPosition);
-        }
-        else if (piece.getPieceType() == PieceType.KNIGHT) {
+        } else if (piece.getPieceType() == PieceType.KNIGHT) {
             KnightMovesCalculator knightMoves = new KnightMovesCalculator();
             return knightMoves.pieceMoves(board, myPosition);
-        }
-        else if (piece.getPieceType() == PieceType.KING) {
+        } else if (piece.getPieceType() == PieceType.KING) {
             KingMovesCalculator kingMoves = new KingMovesCalculator();
             return kingMoves.pieceMoves(board, myPosition);
         }

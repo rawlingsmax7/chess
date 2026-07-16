@@ -7,7 +7,7 @@ public class KingMovesCalculator implements ChessMovesCalculator {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
         ArrayList<ChessMove> posMoves = new ArrayList<ChessMove>();
 
-        int[][] posDirections = {{0,1},{1,0},{-1,0},{0,-1},{1,1},{1,-1},{-1,-1},{-1,1}};
+        int[][] posDirections = {{0, 1}, {1, 0}, {-1, 0}, {0, -1}, {1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
 
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
@@ -32,11 +32,9 @@ public class KingMovesCalculator implements ChessMovesCalculator {
                     ChessMove posMove = new ChessMove(position, posPosition, null);
                     posMoves.add(posMove);
 
-                }
-                else if (pieceInWay.getTeamColor() == actingPiece.getTeamColor()) {
+                } else if (pieceInWay.getTeamColor() == actingPiece.getTeamColor()) {
                     // same team
-                }
-                else {
+                } else {
                     // enemy team
                     ChessMove posMove = new ChessMove(position, posPosition, null);
                     posMoves.add(posMove);

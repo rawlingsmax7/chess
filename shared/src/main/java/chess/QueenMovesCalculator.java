@@ -2,9 +2,8 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-public class QueenMovesCalculator implements ChessMovesCalculator{
+public class QueenMovesCalculator implements ChessMovesCalculator {
 
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
 
@@ -13,7 +12,7 @@ public class QueenMovesCalculator implements ChessMovesCalculator{
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
 
-        int[][] posDirections = {{0,1},{1,0},{-1,0},{0,-1},{1,1},{1,-1},{-1,-1},{-1,1}};
+        int[][] posDirections = {{0, 1}, {1, 0}, {-1, 0}, {0, -1}, {1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
 
         ChessPiece actingPiece = board.getPiece(position);
 
@@ -21,7 +20,7 @@ public class QueenMovesCalculator implements ChessMovesCalculator{
             int rowStep = posDirections[i][0];
             int colStep = posDirections[i][1];
             for (int row = currentRow + rowStep,
-                col = currentCol + colStep;
+                 col = currentCol + colStep;
                  (1 <= row && row <= 8) && (1 <= col && col <= 8);
                  row += rowStep, col += colStep) {
 
@@ -34,12 +33,10 @@ public class QueenMovesCalculator implements ChessMovesCalculator{
                     ChessMove posMove = new ChessMove(position, posPosition, null);
                     posMoves.add(posMove);
 
-                }
-                else if (pieceInWay.getTeamColor() == actingPiece.getTeamColor()) {
+                } else if (pieceInWay.getTeamColor() == actingPiece.getTeamColor()) {
                     // same team
                     break;
-                }
-                else {
+                } else {
                     // enemy team
                     ChessMove posMove = new ChessMove(position, posPosition, null);
                     posMoves.add(posMove);

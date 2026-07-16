@@ -12,7 +12,7 @@ public class BishopMovesCalculator implements ChessMovesCalculator {
         // array list to store different diagonal positions
         // first number is row, second is column
         // up right, then up left, then down left, then down right
-        int[][] directions = {{1,1},{1,-1},{-1,-1},{-1,1}};
+        int[][] directions = {{1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
 
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
@@ -26,7 +26,7 @@ public class BishopMovesCalculator implements ChessMovesCalculator {
             int colStep = directions[i][1];
 
             for (int row = currentRow + rowStep,
-                     col = currentCol + colStep;
+                 col = currentCol + colStep;
                  (1 <= row && row <= board.squares.length) &&
                          (1 <= col && col <= board.squares.length);
                  row += rowStep, col += colStep) {

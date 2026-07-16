@@ -2,7 +2,6 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class RookMovesCalculator implements ChessMovesCalculator {
 
@@ -10,7 +9,7 @@ public class RookMovesCalculator implements ChessMovesCalculator {
         ArrayList<ChessMove> possibleMoves = new ArrayList<ChessMove>();
 
         // right, up, down, left
-        int[][] directions = {{0,1},{1,0},{-1,0},{0,-1}};
+        int[][] directions = {{0, 1}, {1, 0}, {-1, 0}, {0, -1}};
 
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
@@ -22,7 +21,7 @@ public class RookMovesCalculator implements ChessMovesCalculator {
             int colStep = directions[i][1];
 
             for (int row = currentRow + rowStep,
-                col = currentCol + colStep;
+                 col = currentCol + colStep;
                  (1 <= row && row <= 8) && (1 <= col && col <= 8);
                  row += rowStep, col += colStep) {
                 ChessPosition posPosition = new ChessPosition(row, col);
@@ -32,12 +31,10 @@ public class RookMovesCalculator implements ChessMovesCalculator {
                 if (pieceInWay == null) {
                     ChessMove posMove = new ChessMove(position, posPosition, null);
                     possibleMoves.add(posMove);
-                }
-                else if (pieceInWay.getTeamColor() == actingPiece.getTeamColor()) {
+                } else if (pieceInWay.getTeamColor() == actingPiece.getTeamColor()) {
                     // friendly piece
                     break;
-                }
-                else {
+                } else {
                     ChessMove posMove = new ChessMove(position, posPosition, null);
                     possibleMoves.add(posMove);
                     break;
