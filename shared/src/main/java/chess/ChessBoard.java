@@ -15,7 +15,7 @@ public class ChessBoard {
 
     // squares is the board object that is a multi dimensional array to hold chess pieces
     // indices for accessing this array are actually 0-7
-    ChessPiece[][] squares = new ChessPiece[8][8];
+    private ChessPiece[][] squares = new ChessPiece[8][8];
 
     public ChessBoard() {
 
@@ -75,6 +75,13 @@ public class ChessBoard {
             addPiece(posWhite, pieceWhite);
             addPiece(posBlack, pieceBlack);
         }
+    }
+
+    public boolean isInBounds(int row, int col) {
+        return ((1 <= row) &&
+                (row <= 8) &&
+                (1 <= col) &&
+                (col <= 8));
     }
 
     @Override

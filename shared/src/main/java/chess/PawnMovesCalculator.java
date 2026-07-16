@@ -66,7 +66,7 @@ public class PawnMovesCalculator implements ChessMovesCalculator {
             int row = startingRow + direction;
             int col = startingCol; // col doesn't change
             // CHECK BOUNDS
-            if ((1 <= row && row <= 8) && (1 <= col && col <= 8)) {
+            if (board.isInBounds(row, col)) {
                 ChessPosition posPosition = new ChessPosition(row, col);
                 ChessPiece pieceInWay = board.getPiece(posPosition);
                 if (pieceInWay == null) {
@@ -93,7 +93,7 @@ public class PawnMovesCalculator implements ChessMovesCalculator {
             int row = startingRow + rowStep;
             int col = startingCol + colStep;
 
-            if ((1 <= row && row <= 8) && (1 <= col && col <= 8)) {
+            if (board.isInBounds(row, col)) {
                 ChessPosition posPosition = new ChessPosition(row, col);
                 ChessPiece pieceInWay = board.getPiece(posPosition);
                 // check now if a piece is in way
