@@ -3,12 +3,12 @@ package dataaccess;
 import model.AuthData;
 
 public interface AuthTokenDao {
-    void clear();
+    void clear() throws DataAccessException;
 
-    void storeAuth(AuthData auth);
+    void storeAuth(AuthData auth) throws DataAccessException;
 
-    AuthData getAuth(String authToken);
+    AuthData getAuth(String authToken) throws DataAccessException;
 
-    void deleteAuth(AuthData auth);
+    void deleteAuth(AuthData auth) throws DataAccessException;
 
 }

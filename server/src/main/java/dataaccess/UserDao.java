@@ -3,10 +3,10 @@ package dataaccess;
 import model.UserData;
 
 public interface UserDao {
-    void clear();
+    void clear() throws DataAccessException;
 
-    void storeUser(UserData user);
+    void storeUser(UserData user) throws DataAccessException;
 
-    UserData getUser(String username);
+    UserData getUser(String username) throws DataAccessException;
 
 }
