@@ -1,6 +1,9 @@
 package dataaccess;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Properties;
 
 public class DatabaseManager {
@@ -28,6 +31,44 @@ public class DatabaseManager {
             throw new DataAccessException("failed to create database", ex);
         }
     }
+
+    public static void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        try (Connection connection = DatabaseManager.getConnection()) {
+            for (String statement : createStatements) {
+                try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException exception) {
+            throw new DataAccessException("Unable to configure database: " + exception.getMessage(), exception);
+        }
+    }
+
+    private static final String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS user (
+            username VARCHAR(100) NOT NULL PRIMARY KEY,
+            password VARCHAR(100) NOT NULL,
+            email VARCHAR(100) NOT NULL
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS auth (
+            authToken VARCHAR(100) NOT NULL PRIMARY KEY,
+            username VARCHAR(100)
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS game (
+            gameID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+            whiteUsername VARCHAR(100),
+            blackUsername VARCHAR(100),
+            gameName VARCHAR(100) NOT NULL,
+            game TEXT
+            )
+            """
+    };
 
     /**
      * Create a connection to the database and sets the catalog based upon the

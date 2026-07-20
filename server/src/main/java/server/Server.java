@@ -19,6 +19,11 @@ public class Server {
         MemoryUserDao userDao = new MemoryUserDao();
         MemoryGameDao gameDao = new MemoryGameDao();
         MemoryAuthTokenDao authDao = new MemoryAuthTokenDao();
+        try {
+            DatabaseManager.configureDatabase();
+        } catch (DataAccessException exception) {
+            throw new RuntimeException("Failed to initialize database", exception);
+        }
 
         ClearService clearService = new ClearService(userDao, gameDao, authDao);
         UserService userService = new UserService(userDao, authDao);
