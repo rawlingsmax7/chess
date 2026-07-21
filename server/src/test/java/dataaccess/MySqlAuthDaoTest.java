@@ -16,7 +16,6 @@ public class MySqlAuthDaoTest {
     @BeforeEach
     public void setupTest() throws DataAccessException {
         authDao = new MySqlAuthDao();
-
         authDao.clear();
     }
 
@@ -65,7 +64,6 @@ public class MySqlAuthDaoTest {
         AuthData foundAuth = authDao.getAuth(authToken);
         assertNotNull(foundAuth);
         assertEquals("Max", foundAuth.username());
-
         assertEquals(authToken, foundAuth.authToken());
     }
 
