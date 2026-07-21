@@ -3,6 +3,7 @@ package service;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import requests.*;
 
 import java.util.UUID;
@@ -52,7 +53,7 @@ public class UserService {
 
         UserData user = userDao.getUser(username);
         // if that username hasn't been registered or if the password doesn't match what's stored with that user throw exception
-        if (user == null || !user.password().equals(password)) {
+        if (user == null || !BCrypt.checkpw(password, user.password())) {
             throw new UnauthorizedException("Error: unauthorized");
         }
         AuthData auth = new AuthData(generateAuthToken(), username);
