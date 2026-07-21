@@ -18,7 +18,7 @@ public class Server {
         // create the database, DAOs
         UserDao userDao = new MySqlUserDao();
         MemoryGameDao gameDao = new MemoryGameDao();
-        MemoryAuthTokenDao authDao = new MemoryAuthTokenDao();
+        AuthTokenDao authDao = new MySqlAuthDao();
         try {
             DatabaseManager.configureDatabase();
         } catch (DataAccessException exception) {
