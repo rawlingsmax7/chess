@@ -9,6 +9,7 @@ import java.util.Map;
 public class MemoryGameDao implements GameDao {
     // maps gameIDs to GameData
     private final Map<Integer, GameData> games = new HashMap<>();
+    private int nextID = 1;
 
     @Override
     public void clear() {
@@ -16,8 +17,11 @@ public class MemoryGameDao implements GameDao {
     }
 
     @Override
-    public void storeGame(GameData game) {
-        games.put(game.gameID(), game);
+    public int storeGame(GameData game) {
+        int id = nextID++;
+        games.put(id, new GameData(id, game.whiteUsername(), game.blackUsername(),
+                game.gameName(), game.game()));
+        return id;
     }
 
     @Override

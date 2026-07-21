@@ -17,7 +17,7 @@ public class Server {
 
         // create the database, DAOs
         UserDao userDao = new MySqlUserDao();
-        MemoryGameDao gameDao = new MemoryGameDao();
+        GameDao gameDao = new MySqlGameDao();
         AuthTokenDao authDao = new MySqlAuthDao();
         try {
             DatabaseManager.configureDatabase();

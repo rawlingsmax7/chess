@@ -10,7 +10,6 @@ import requests.*;
 public class GameService {
     private final GameDao gameDao;
     private final AuthTokenDao authDao;
-    private int nextGameID = 1;
 
     public GameService(GameDao gameDao, AuthTokenDao authDao) {
         this.gameDao = gameDao;
@@ -30,12 +29,9 @@ public class GameService {
         if (gameName == null) {
             throw new BadRequestException("Error: bad request");
         }
-
-        int newID = nextGameID;
-        nextGameID++; // increment the nextGameID
-
-        GameData game = new GameData(newID, null, null, gameName, new ChessGame());
-        gameDao.storeGame(game);
+        // the gameID 0 actually gets overwritten by the GameDao
+        GameData game = new GameData(0, null, null, gameName, new ChessGame());
+        int newID = gameDao.storeGame(game);
         return new CreateResult(newID);
     }
 
