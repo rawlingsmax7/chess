@@ -16,7 +16,7 @@ public class Server {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // create the database, DAOs
-        MemoryUserDao userDao = new MemoryUserDao();
+        UserDao userDao = new MySqlUserDao();
         MemoryGameDao gameDao = new MemoryGameDao();
         MemoryAuthTokenDao authDao = new MemoryAuthTokenDao();
         try {
