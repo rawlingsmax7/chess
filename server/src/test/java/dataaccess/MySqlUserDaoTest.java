@@ -4,9 +4,9 @@ import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mindrot.jbcrypt.BCrypt;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class MySqlUserDaoTest {
 
@@ -39,8 +39,8 @@ public class MySqlUserDaoTest {
         assertNotNull(foundUser);
         assertEquals("Max", foundUser.username());
         assertEquals("max@mail.com", foundUser.email());
-        // if they aren't equal it shows that the password was hashed
-        assertNotEquals("password", foundUser.password());
+        // the DAO stores the password, the service does the hashing now
+        assertEquals("password", foundUser.password());
     }
 
     @Test
@@ -62,9 +62,7 @@ public class MySqlUserDaoTest {
         assertNotNull(foundUser);
         assertEquals("Max", foundUser.username());
         assertEquals("max@mail.com", foundUser.email());
-        // if they aren't equal it shows that the password was hashed
-        assertNotEquals("password", foundUser.password());
-        assertTrue(BCrypt.checkpw("password", foundUser.password()));
+        assertEquals("password", foundUser.password());
     }
 
     @Test

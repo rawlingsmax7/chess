@@ -34,7 +34,8 @@ public class UserService {
         if (userDao.getUser(username) != null) {
             throw new AlreadyTakenException("Error: already taken");
         }
-        UserData user = new UserData(username, password, email);
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        UserData user = new UserData(username, hashedPassword, email);
         userDao.storeUser(user);
 
         AuthData auth = new AuthData(generateAuthToken(), username);

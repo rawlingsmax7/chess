@@ -1,7 +1,6 @@
 package dataaccess;
 
 import model.UserData;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -26,9 +25,7 @@ public class MySqlUserDao implements UserDao {
         try (var connection = DatabaseManager.getConnection();
              var statement = connection.prepareStatement(sql);) {
             statement.setString(1, user.username());
-
-            String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
-            statement.setString(2, hashedPassword);
+            statement.setString(2, user.password());
             statement.setString(3, user.email());
             statement.executeUpdate();
         } catch (SQLException exception) {
