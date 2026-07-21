@@ -38,7 +38,7 @@ public class MySqlUserDaoTest {
         UserData foundUser = userDao.getUser("Max");
         assertNotNull(foundUser);
         assertEquals("Max", foundUser.username());
-        assertEquals("max@mail.com", foundUser.email());
+        assertEquals("max@gmail.com", foundUser.email());
         // the DAO stores the password, the service does the hashing now
         assertEquals("password", foundUser.password());
     }
@@ -58,7 +58,7 @@ public class MySqlUserDaoTest {
         UserData user = new UserData("John", "123", "john@gmail.com");
         userDao.storeUser(user);
 
-        UserData foundUser = userDao.getUser("Max");
+        UserData foundUser = userDao.getUser("John");
         assertEquals(user, foundUser);
     }
 
