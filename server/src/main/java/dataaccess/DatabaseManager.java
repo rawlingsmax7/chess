@@ -35,7 +35,7 @@ public class DatabaseManager {
     public static void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
         try (Connection connection = DatabaseManager.getConnection()) {
-            for (String statement : createStatements) {
+            for (String statement : CREATE_STATEMENTS) {
                 try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
@@ -45,7 +45,7 @@ public class DatabaseManager {
         }
     }
 
-    private static final String[] createStatements = {
+    private static final String[] CREATE_STATEMENTS = {
             """
             CREATE TABLE IF NOT EXISTS user (
             username VARCHAR(100) NOT NULL PRIMARY KEY,

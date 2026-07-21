@@ -21,7 +21,7 @@ public class MySqlUserDaoTest {
     // positive clear test
     @Test
     public void clearSuccess() throws DataAccessException {
-        UserData user = new UserData("Max", "password", "max@mail.com");
+        UserData user = new UserData("Max", "password", "max@gmail.com");
         userDao.storeUser(user);
 
         userDao.clear();
@@ -32,7 +32,7 @@ public class MySqlUserDaoTest {
 
     @Test
     public void storeUserSuccess() throws DataAccessException {
-        UserData user = new UserData("Max", "password", "max@mail.com");
+        UserData user = new UserData("Max", "password", "max@gmail.com");
         userDao.storeUser(user);
 
         UserData foundUser = userDao.getUser("Max");
@@ -46,23 +46,20 @@ public class MySqlUserDaoTest {
     @Test
     // try to store the same username twice
     public void storeDuplicatedUser() throws DataAccessException {
-        UserData user = new UserData("Max", "password", "max@mail.com");
+        UserData user = new UserData("Max", "password", "max@gmail.com");
         userDao.storeUser(user);
-        UserData repeatUser = new UserData("Max", "password", "max@mail.com");
+        UserData repeatUser = new UserData("Max", "password", "max@gmail.com");
 
         Assertions.assertThrows(DataAccessException.class, () -> userDao.storeUser(repeatUser));
     }
 
     @Test
     public void getUserSuccess() throws DataAccessException {
-        UserData user = new UserData("Max", "password", "max@mail.com");
+        UserData user = new UserData("John", "123", "john@gmail.com");
         userDao.storeUser(user);
 
         UserData foundUser = userDao.getUser("Max");
-        assertNotNull(foundUser);
-        assertEquals("Max", foundUser.username());
-        assertEquals("max@mail.com", foundUser.email());
-        assertEquals("password", foundUser.password());
+        assertEquals(user, foundUser);
     }
 
     @Test

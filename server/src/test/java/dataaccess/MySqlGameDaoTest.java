@@ -87,7 +87,7 @@ public class MySqlGameDaoTest {
         int id = gameDao.storeGame(game);
         ChessGame newGame2 = new ChessGame();
         // the 0 is actually throwaway
-        GameData game2 = new GameData(0, null, null, "Amatuer Game", newGame2);
+        GameData game2 = new GameData(0, null, null, "Amateur Game", newGame2);
         int id2 = gameDao.storeGame(game2);
 
         Collection<GameData> gameList = gameDao.getGames();
