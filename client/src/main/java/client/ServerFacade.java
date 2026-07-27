@@ -33,11 +33,28 @@ public class ServerFacade {
         return result;
     }
 
-    public LogoutResult logout(LogoutRequest request) throws ResponseException {
-        LogoutResult result = makeRequest("DELETE", "/session", request, LogoutResult.class);
+    public LogoutResult logout() throws ResponseException {
+        // the Server builds own LogoutRequest from the header
+        LogoutResult result = makeRequest("DELETE", "/session", null, LogoutResult.class);
         this.authToken = null;
 
         return result;
+    }
+
+    public void clear() throws ResponseException {
+        makeRequest("DELETE", "/db", null, null);
+    }
+
+    public ListResult listGames() throws ResponseException {
+        return makeRequest("GET", "/game", null, ListResult.class);
+    }
+
+    public CreateResult createGame(CreateRequest request) throws ResponseException {
+        return makeRequest("POST", "/game", request, CreateResult.class);
+    }
+
+    public JoinResult joinGame(JoinRequest request) throws ResponseException {
+        return makeRequest("PUT", "/game", request, JoinResult.class);
     }
 
 
