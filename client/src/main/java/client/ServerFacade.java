@@ -1,6 +1,7 @@
 package client;
 
 import com.google.gson.Gson;
+import requests.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,10 +13,33 @@ import java.net.URL;
 
 public class ServerFacade {
     private final String serverUrl;
+    private String authToken;
 
     public ServerFacade(String url) {
         serverUrl = url;
     }
+
+    public RegisterResult register(RegisterRequest request) throws ResponseException {
+        RegisterResult result = makeRequest("POST", "/user", request, RegisterResult.class);
+        this.authToken = result.authToken();
+
+        return result;
+    }
+
+    public LoginResult login(LoginRequest request) throws ResponseException {
+        LoginResult result = makeRequest("POST", "/session", request, LoginResult.class);
+        this.authToken = result.authToken();
+
+        return result;
+    }
+
+    public LogoutResult logout(LogoutRequest request) throws ResponseException {
+        LogoutResult result = makeRequest("DELETE", "/session", request, LogoutResult.class);
+        this.authToken = null;
+
+        return result;
+    }
+
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         // path will be /user or like /session
@@ -26,6 +50,11 @@ public class ServerFacade {
             // method is the "POST", "GET", sort of sql format
             http.setRequestMethod(method);
             http.setDoOutput(true);
+
+            // if there's an authToken then we need to add it as part of the request
+            if (authToken != null) {
+                http.addRequestProperty("Authorization", authToken);
+            }
 
             writeBody(request, http);
             http.connect();
