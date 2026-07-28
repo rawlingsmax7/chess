@@ -1,6 +1,9 @@
 package ui;
 
 import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -11,17 +14,11 @@ public class DrawBoard {
 
     // Board dimensions.
     private static final int BOARD_SIZE_IN_SQUARES = 8;
-    private static final int SQUARE_SIZE_IN_PADDED_CHARS = 3;
-    private static final int LABEL_GAP = 1;
 
-    // Padded characters.
-    private static final String EMPTY = " ";
+    private static final String EM_SPACE = "\u2003";
 
     private ChessBoard board;
     private PrintStream output;
-
-    String[] numberHeaders = {"8", "7", "6", "5", "4", "3", "2", "1"};
-
 
     public DrawBoard(ChessBoard board, PrintStream output) {
         this.board = board;
@@ -51,26 +48,26 @@ public class DrawBoard {
     private void drawTopHeaders() {
         setBlack();
 
-        // first black part
-        drawHeader(" ");
+        // blank square at start of row
+        output.print(EMPTY);
 
         String[] headers = {"a", "b", "c", "d", "e", "f", "g", "h"};
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             drawHeader(headers[boardCol]);
-
         }
 
-        drawHeader(" ");
+        // blank square at end of row
+        output.print(EMPTY);
 
         output.print(RESET_BG_COLOR);
         output.println();
     }
 
-    private void drawHeader(String headerText) {
-        // one space, one letter, one space
-        output.print(EMPTY);
-        printHeaderText(headerText);
-        output.print(EMPTY);
+    private void drawHeader(String text) {
+        // one narrow space + label + one WIDE em-space = same total width as a square
+        output.print(" ");
+        printHeaderText(text);
+        output.print(EM_SPACE);
     }
 
 
@@ -84,47 +81,77 @@ public class DrawBoard {
     }
 
     private void drawRows() {
-        for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
+        // we are actually going to print row 8 first because that's the way the terminal prints
+        // and additionally we are doing this so it's easy to access teh ChessBoard object
+        for (int row = 8; row >= 1; row--) {
             // need to pass which row we are drawing
-            drawRowOfSquares(boardRow);
+            drawRowOfSquares(row);
         }
     }
 
-    private void drawRowOfSquares(int boardRow) {
+    private void drawRowOfSquares(int row) {
         setBlack();
-        drawHeader(numberHeaders[boardRow]);
+        drawHeader(String.valueOf(row));
 
-        for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
-            if ((boardRow + boardCol) % 2 == 0) {
-                setWhite();
+        for (int col = 1; col <= 8; col++) {
+            if ((row + col) % 2 == 0) {
+                setLightSquare();
             } else {
-                setBlack();
+                setDarkSquare();
             }
 
-            // placeholder: 3 blank chars per square. Later, print the piece string here instead.
-            output.print(EMPTY.repeat(SQUARE_SIZE_IN_PADDED_CHARS));
+            ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+            if (piece == null) {
+                output.print(EMPTY);
+            } else {
+                printPiece(piece);
+            }
         }
 
         setBlack();
-        drawHeader(numberHeaders[boardRow]);
+        drawHeader(String.valueOf(row));
 
         output.print(RESET_BG_COLOR);
         output.println();
     }
 
-    private void setWhite() {
-        output.print(SET_BG_COLOR_WHITE);
-        output.print(SET_TEXT_COLOR_WHITE);
+    private void printPiece(ChessPiece piece) {
+        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+            output.print(SET_TEXT_COLOR_WHITE);
+        } else {
+            output.print(SET_TEXT_COLOR_BLACK);
+        }
+
+        // just use the black kind because it's a lot clearer
+        if (piece.getPieceType() == ChessPiece.PieceType.BISHOP) {
+            output.print(BLACK_BISHOP);
+        } else if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
+            output.print(BLACK_ROOK);
+        } else if (piece.getPieceType() == ChessPiece.PieceType.QUEEN) {
+            output.print(BLACK_QUEEN);
+        } else if (piece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
+            output.print(BLACK_KNIGHT);
+        } else if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+            output.print(BLACK_KING);
+        }
+        // PAWN CASE
+        else {
+            output.print(BLACK_PAWN);
+        }
     }
 
+    // light and dark board squares (grey so both white and black pieces stay readable)
+    private void setLightSquare() {
+        output.print(SET_BG_COLOR_LIGHT_GREY);
+    }
+
+    private void setDarkSquare() {
+        output.print(SET_BG_COLOR_DARK_GREY);
+    }
+
+    // black background for the header row/column (kept separate from the squares)
     private void setBlack() {
         output.print(SET_BG_COLOR_BLACK);
         output.print(SET_TEXT_COLOR_BLACK);
-    }
-
-    private void drawPiece(String piece) {
-        output.print(SET_TEXT_COLOR_BLACK);
-
-        output.print(piece);
     }
 }
