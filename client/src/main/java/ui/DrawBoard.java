@@ -31,29 +31,35 @@ public class DrawBoard {
         ChessBoard board = new ChessBoard();
         board.resetBoard();
 
-        new DrawBoard(board, out).draw();
+        new DrawBoard(board, out).draw(true);
     }
 
-    public void draw() {
+    public void draw(boolean whitePerspective) {
         output.print(ERASE_SCREEN);
 
-        drawTopHeaders();
-        drawRows();
-        drawTopHeaders();
+        drawTopHeaders(whitePerspective);
+        drawRows(whitePerspective);
+        drawTopHeaders(whitePerspective);
 
         output.print(SET_BG_COLOR_BLACK);
         output.print(SET_TEXT_COLOR_WHITE);
     }
 
-    private void drawTopHeaders() {
+    private void drawTopHeaders(boolean whitePerspective) {
         setBlack();
 
         // blank square at start of row
         output.print(EMPTY);
 
         String[] headers = {"a", "b", "c", "d", "e", "f", "g", "h"};
-        for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
-            drawHeader(headers[boardCol]);
+        if (whitePerspective) {
+            for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; boardCol++) {
+                drawHeader(headers[boardCol]);
+            }
+        } else {
+            for (int boardCol = BOARD_SIZE_IN_SQUARES - 1; boardCol >= 0; boardCol--) {
+                drawHeader(headers[boardCol]);
+            }
         }
 
         // blank square at end of row
@@ -80,34 +86,57 @@ public class DrawBoard {
         setBlack();
     }
 
-    private void drawRows() {
+    private void drawRows(boolean whitePerspective) {
         // we are actually going to print row 8 first because that's the way the terminal prints
         // and additionally we are doing this so it's easy to access teh ChessBoard object
-        for (int row = 8; row >= 1; row--) {
-            // need to pass which row we are drawing
-            drawRowOfSquares(row);
+        if (whitePerspective) {
+            for (int row = 8; row >= 1; row--) {
+                // need to pass which row we are drawing
+                drawRowOfSquares(row, whitePerspective);
+            }
+        } else {
+            for (int row = 1; row <= 8; row++) {
+                // need to pass which row we are drawing
+                drawRowOfSquares(row, whitePerspective);
+            }
         }
+
     }
 
-    private void drawRowOfSquares(int row) {
+    private void drawRowOfSquares(int row, boolean whitePerspective) {
         setBlack();
         drawHeader(String.valueOf(row));
+        if (whitePerspective) {
+            for (int col = 1; col <= 8; col++) {
+                if ((row + col) % 2 == 0) {
+                    setDarkSquare();
+                } else {
+                    setLightSquare();
+                }
 
-        for (int col = 1; col <= 8; col++) {
-            if ((row + col) % 2 == 0) {
-                setLightSquare();
-            } else {
-                setDarkSquare();
+                ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+                if (piece == null) {
+                    output.print(EMPTY);
+                } else {
+                    printPiece(piece);
+                }
             }
+        } else {
+            for (int col = 8; col >= 1; col--) {
+                if ((row + col) % 2 == 0) {
+                    setDarkSquare();
+                } else {
+                    setLightSquare();
+                }
 
-            ChessPiece piece = board.getPiece(new ChessPosition(row, col));
-            if (piece == null) {
-                output.print(EMPTY);
-            } else {
-                printPiece(piece);
+                ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+                if (piece == null) {
+                    output.print(EMPTY);
+                } else {
+                    printPiece(piece);
+                }
             }
         }
-
         setBlack();
         drawHeader(String.valueOf(row));
 
