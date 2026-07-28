@@ -95,12 +95,10 @@ public class ServerFacade {
 
     private static <T> T readBody(HttpURLConnection http, Class<T> responseClass) throws IOException {
         T response = null;
-        if (http.getContentLength() < 0) {
-            try (InputStream responseBody = http.getInputStream()) {
-                InputStreamReader reader = new InputStreamReader(responseBody);
-                if (responseClass != null) {
-                    response = new Gson().fromJson(reader, responseClass);
-                }
+        try (InputStream responseBody = http.getInputStream()) {
+            InputStreamReader reader = new InputStreamReader(responseBody);
+            if (responseClass != null) {
+                response = new Gson().fromJson(reader, responseClass);
             }
         }
         return response;
