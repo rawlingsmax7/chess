@@ -4,39 +4,26 @@ import requests.LoginRequest;
 import requests.RegisterRequest;
 
 import java.util.Arrays;
-import java.util.Scanner;
 
-public class PreLoginClient {
-
-    private final ServerFacade facade;
+public class PreLoginClient extends LoginClient {
 
     PreLoginClient(ServerFacade facade) {
-        this.facade = facade;
+        super(facade);
     }
 
+    @Override
     public void run() {
         System.out.println("Welcome to Chess. Type \"help\" to get started.");
-
-        Scanner scanner = new Scanner(System.in);
-        var result = "";
-        while (!result.equals("quit")) {
-            System.out.print("[LOGGED OUT] >>> ");
-            String line = scanner.nextLine();
-
-            try {
-                result = evaluate(line);
-                if (!result.equals("quit")) {
-                    System.out.println(result);
-                }
-                // otherwise if it is quit we don't actually print quit
-            } catch (Throwable exception) {
-                System.out.println("Unexpected error, please try again.");
-            }
-        }
-        System.out.println();
+        super.run();
     }
 
-    private String evaluate(String input) {
+    @Override
+    protected String prompt() {
+        return "[LOGGED OUT] >>> ";
+    }
+
+    @Override
+    protected String evaluate(String input) {
         try {
             var tokens = input.split(" ");
             var command = (tokens.length > 0) ? tokens[0].toLowerCase() : "help";

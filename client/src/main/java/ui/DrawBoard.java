@@ -107,40 +107,26 @@ public class DrawBoard {
     private void drawRowOfSquares(int row, boolean whitePerspective) {
         setBlack();
         drawHeader(String.valueOf(row));
-        if (whitePerspective) {
-            for (int col = 1; col <= 8; col++) {
-                if ((row + col) % 2 == 0) {
-                    setDarkSquare();
-                } else {
-                    setLightSquare();
-                }
-
-                ChessPiece piece = board.getPiece(new ChessPosition(row, col));
-                if (piece == null) {
-                    output.print(EMPTY);
-                } else {
-                    printPiece(piece);
-                }
+        for (int i = 0; i < BOARD_SIZE_IN_SQUARES; i++) {
+            // change the starting column depending on if we are drawing in white or black's
+            // perspective
+            int col = whitePerspective ? (i + 1) : (BOARD_SIZE_IN_SQUARES - i);
+            if ((row + col) % 2 == 0) {
+                setDarkSquare();
+            } else {
+                setLightSquare();
             }
-        } else {
-            for (int col = 8; col >= 1; col--) {
-                if ((row + col) % 2 == 0) {
-                    setDarkSquare();
-                } else {
-                    setLightSquare();
-                }
 
-                ChessPiece piece = board.getPiece(new ChessPosition(row, col));
-                if (piece == null) {
-                    output.print(EMPTY);
-                } else {
-                    printPiece(piece);
-                }
+            ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+            if (piece == null) {
+                output.print(EMPTY);
+            } else {
+                printPiece(piece);
             }
         }
+        
         setBlack();
         drawHeader(String.valueOf(row));
-
         output.print(RESET_BG_COLOR);
         output.println();
     }

@@ -27,7 +27,8 @@ public class ServerFacadeTests {
     }
 
     @AfterAll
-    static void stopServer() {
+    static void cleanup() throws Exception {
+        new ServerFacade(url).clear();
         server.stop();
     }
 

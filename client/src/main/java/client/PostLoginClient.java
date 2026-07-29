@@ -7,38 +7,22 @@ import requests.ListResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Scanner;
 
-public class PostLoginClient {
+public class PostLoginClient extends LoginClient {
 
-    private final ServerFacade facade;
     private ArrayList<GameData> listedGames = new ArrayList<>();
 
     PostLoginClient(ServerFacade facade) {
-        this.facade = facade;
+        super(facade);
     }
 
-    public void run() {
-        Scanner scanner = new Scanner(System.in);
-        var result = "";
-        while (!result.equals("quit")) {
-            System.out.print("[LOGGED IN] >>> ");
-            String line = scanner.nextLine();
-
-            try {
-                result = evaluate(line);
-                if (!result.equals("quit")) {
-                    System.out.println(result);
-                }
-                // otherwise if it is quit we don't actually print quit
-            } catch (Throwable exception) {
-                System.out.println("Unexpected error, please try again.");
-            }
-        }
-        System.out.println();
+    @Override
+    protected String prompt() {
+        return "[LOGGED IN] >>> ";
     }
 
-    private String evaluate(String input) {
+    @Override
+    protected String evaluate(String input) {
         try {
             var tokens = input.split(" ");
             var command = (tokens.length > 0) ? tokens[0].toLowerCase() : "help";
