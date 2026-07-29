@@ -117,7 +117,7 @@ public class PostLoginClient extends LoginClient {
                 Type one of the following options:\s
                 "help"  ---> Display actions you can do.
                 "logout"  ---> Logs the user out.
-                "create <NAME>" ---> Create a new chess game with the given input.\
+                "create <NAME>" ---> Create a new chess game with the given input.
                 "list" ---> Numbers a list of all the games that are currently in session.
                 "join <WHITE|BLACK> <NUMBER>" ---> join a current game from the given perspective
                 "observe <NUMBER>" ---> observe a current game from the given perspective
