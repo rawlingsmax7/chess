@@ -39,7 +39,7 @@ public class PreLoginClient extends LoginClient {
                     } else {
                         LoginRequest loginRequest = new LoginRequest(params[0], params[1]);
                         facade.login(loginRequest);
-                        System.out.print("Login success!");
+                        System.out.println("Login success!");
                         new PostLoginClient(facade).run();
                         return "";
                     }
@@ -51,7 +51,7 @@ public class PreLoginClient extends LoginClient {
                         RegisterRequest registerRequest = new RegisterRequest(params[0], params[1],
                                 params[2]);
                         facade.register(registerRequest);
-                        System.out.print("Register success!");
+                        System.out.println("Register success!");
                         new PostLoginClient(facade).run();
                         return "";
                     }
