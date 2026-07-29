@@ -70,7 +70,12 @@ public class PreLoginClient {
                     return printHelp();
             }
         } catch (ResponseException exception) {
-            return exception.getMessage();
+            return switch (exception.getStatusCode()) {
+                case 400 -> "Bad request, please check your input.";
+                case 401 -> "Invalid username or password.";
+                case 403 -> "That username is already taken.";
+                default -> "Something went wrong. Please try again.";
+            };
         }
     }
 
