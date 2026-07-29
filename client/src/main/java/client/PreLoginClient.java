@@ -20,7 +20,7 @@ public class PreLoginClient {
         Scanner scanner = new Scanner(System.in);
         var result = "";
         while (!result.equals("quit")) {
-            System.out.print(">>> ");
+            System.out.print("[LOGGED OUT] >>> ");
             String line = scanner.nextLine();
 
             try {
@@ -46,7 +46,7 @@ public class PreLoginClient {
                 case "login":
                     // params is username, password
                     if (params.length < 2) {
-                        return "Expected: login <username> <password>";
+                        return "Expected: login <USERNAME> <PASSWORD>";
                     } else {
                         LoginRequest loginRequest = new LoginRequest(params[0], params[1]);
                         facade.login(loginRequest);
@@ -57,7 +57,7 @@ public class PreLoginClient {
                 case "register":
                     // params is username, password, email
                     if (params.length < 3) {
-                        return "Expected: register <username> <password> <email>";
+                        return "Expected: register <USERNAME> <PASSWORD> <EMAIL>";
                     } else {
                         RegisterRequest registerRequest = new RegisterRequest(params[0], params[1],
                                 params[2]);
@@ -84,9 +84,9 @@ public class PreLoginClient {
                 Type one of the following options:\s
                 "help"  ---> Display actions you can do.
                 "quit"  ---> Exits the program.
-                "login <username> <password>" ---> Login to the chess server. Expects username\
+                "login <USERNAME> <PASSWORD>" ---> Login to the chess server. Expects username\
                  followed by the password
-                "register <username> <password> <email>" ---> Register a new user to the chess\
+                "register <USERNAME> <PASSWORD> <EMAIL>" ---> Register a new user to the chess\
                  server. Expects username, password, and email.
                 """;
     }
