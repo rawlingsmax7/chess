@@ -36,13 +36,14 @@ public class DrawBoard {
 
     public void draw(boolean whitePerspective) {
         output.print(ERASE_SCREEN);
+        output.println();
 
         drawTopHeaders(whitePerspective);
         drawRows(whitePerspective);
         drawTopHeaders(whitePerspective);
 
-        output.print(SET_BG_COLOR_BLACK);
-        output.print(SET_TEXT_COLOR_WHITE);
+        output.print(RESET_BG_COLOR);
+        output.print(RESET_TEXT_COLOR);
     }
 
     private void drawTopHeaders(boolean whitePerspective) {

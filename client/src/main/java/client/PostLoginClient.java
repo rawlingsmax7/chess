@@ -87,7 +87,11 @@ public class PostLoginClient {
                         JoinRequest joinRequest = new JoinRequest(params[0].toUpperCase(), gameID);
                         facade.joinGame(joinRequest);
                         System.out.print("Join game success!");
-                        new GameplayClient(facade).run();
+
+                        boolean whitePerspective = params[0].equalsIgnoreCase("WHITE");
+                        GameData game = listedGames.get(inputNumber - 1);
+
+                        new GameplayClient(facade, whitePerspective, game).run();
                         return "";
                     }
                 case "observe":
@@ -103,7 +107,11 @@ public class PostLoginClient {
                         if (inputNumber < 1 || inputNumber > listedGames.size()) {
                             return "No game with that number. Please run \"list\".";
                         }
-                        new GameplayClient(facade).run();
+
+                        boolean whitePerspective = params[0].equalsIgnoreCase("WHITE");
+                        GameData game = listedGames.get(inputNumber - 1);
+
+                        new GameplayClient(facade, whitePerspective, game).run();
                         return "";
                     }
                 default:
@@ -112,8 +120,8 @@ public class PostLoginClient {
         } catch (ResponseException exception) {
             return switch (exception.getStatusCode()) {
                 case 400 -> "Bad request, please check your input.";
-                case 401 -> "Invalid username or password.";
-                case 403 -> "That username is already taken.";
+                case 401 -> "Authorization failed.";
+                case 403 -> "That color is already taken.";
                 default -> "Something went wrong. Please try again.";
             };
         }
