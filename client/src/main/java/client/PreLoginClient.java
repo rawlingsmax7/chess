@@ -25,10 +25,12 @@ public class PreLoginClient {
 
             try {
                 result = evaluate(line);
-                System.out.println(result);
+                if (!result.equals("quit")) {
+                    System.out.println(result);
+                }
+                // otherwise if it is quit we don't actually print quit
             } catch (Throwable exception) {
-                var message = exception.getMessage();
-                System.out.println(message);
+                System.out.println("Unexpected error, please try again.");
             }
         }
         System.out.println();

@@ -27,10 +27,12 @@ public class PostLoginClient {
 
             try {
                 result = evaluate(line);
-                System.out.println(result);
+                if (!result.equals("quit")) {
+                    System.out.println(result);
+                }
+                // otherwise if it is quit we don't actually print quit
             } catch (Throwable exception) {
-                var message = exception.getMessage();
-                System.out.println(message);
+                System.out.println("Unexpected error, please try again.");
             }
         }
         System.out.println();
@@ -45,7 +47,7 @@ public class PostLoginClient {
             switch (command) {
                 case "logout":
                     facade.logout();
-                    System.out.print("Logout success!");
+                    System.out.println("Logout success!");
                     return "quit";
                 case "create":
                     if (params.length < 1) {
@@ -95,12 +97,12 @@ public class PostLoginClient {
                         return "";
                     }
                 case "observe":
-                    if (params.length < 2) {
-                        return "Expected: observe <WHITE|BLACK> <NUMBER>";
+                    if (params.length < 1) {
+                        return "Expected: observe <NUMBER>";
                     } else {
                         int inputNumber;
                         try {
-                            inputNumber = Integer.parseInt(params[1]);
+                            inputNumber = Integer.parseInt(params[0]);
                         } catch (NumberFormatException e) {
                             return "Game number must be a number. Please run \"list\".";
                         }
@@ -108,10 +110,9 @@ public class PostLoginClient {
                             return "No game with that number. Please run \"list\".";
                         }
 
-                        boolean whitePerspective = params[0].equalsIgnoreCase("WHITE");
                         GameData game = listedGames.get(inputNumber - 1);
-
-                        new GameplayClient(facade, whitePerspective, game).run();
+                        // just observe from white perspective
+                        new GameplayClient(facade, true, game).run();
                         return "";
                     }
                 default:
@@ -133,9 +134,9 @@ public class PostLoginClient {
                 "help"  ---> Display actions you can do.
                 "logout"  ---> Logs the user out.
                 "create <NAME>" ---> Create a new chess game with the given input.\
-                "list" ---> Numbers a list of all the games and that are currently in session.
+                "list" ---> Numbers a list of all the games that are currently in session.
                 "join <WHITE|BLACK> <NUMBER>" ---> join a current game from the given perspective
-                "observe <WHITE|BLACK> <NUMBER>" ---> observe a current game from the given perspective
+                "observe <NUMBER>" ---> observe a current game from the given perspective
                 """;
     }
 }
