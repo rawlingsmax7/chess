@@ -58,7 +58,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 // need to deserialize twice because the makeMove command contains more info
                 case MAKE_MOVE -> makeMove(session, username,
                         gson.fromJson(wsMessageContext.message(), MakeMoveCommand.class));
-//                case LEAVE -> leaveGame(session, username, command);
+                case LEAVE -> leaveGame(session, username, command);
 //                case RESIGN -> resign(session, username, command);
             }
         } catch (UnauthorizedException ex) {
@@ -67,6 +67,52 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             ex.printStackTrace();
             sendMessage(session, new ErrorMessage("Error: " + ex.getMessage()));
         }
+    }
+
+//    private void resign(Session session, String username, UserGameCommand command) throws DataAccessException, IOException {
+//        int gameID = command.getGameID();
+//        GameData gameData = gameDao.getGame(gameID);
+//
+//        if (gameData == null) {
+//            sendMessage(session, new ErrorMessage("Error: game ID bad"));
+//            return;
+//        }
+//        ChessGame.TeamColor role = getRole(username, gameData);
+//    }
+
+    private void leaveGame(Session session, String username, UserGameCommand command) throws DataAccessException, IOException {
+        int gameID = command.getGameID();
+        GameData gameData = gameDao.getGame(gameID);
+
+        if (gameData == null) {
+            sendMessage(session, new ErrorMessage("Error: game ID bad"));
+            return;
+        }
+        ChessGame.TeamColor role = getRole(username, gameData);
+
+
+        // leaving game as white so set whiteusername to null
+        if (role == ChessGame.TeamColor.WHITE) {
+            GameData updatedGame = new GameData(gameID, null, gameData.blackUsername(),
+                    gameData.gameName(), gameData.game());
+            gameDao.updateGame(updatedGame);
+        } else if (role == ChessGame.TeamColor.BLACK) {
+            GameData updatedGame = new GameData(gameID, gameData.whiteUsername(), null,
+                    gameData.gameName(), gameData.game());
+            gameDao.updateGame(updatedGame);
+        }
+
+        // Server sends a Notification message to all other clients in that game informing them
+        // that the root client left. This applies to both players and observers.
+        String broadcastMessage = "";
+        if (role == null) {
+            broadcastMessage = username + " left game as an observer";
+        } else {
+            broadcastMessage = username + " left game as " + role;
+        }
+        connections.broadcast(gameID, session, new NotificationMessage(broadcastMessage));
+
+        connections.remove(gameID, session);
     }
 
     private void makeMove(Session session, String username, MakeMoveCommand command) throws DataAccessException, IOException {
@@ -200,7 +246,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         int rank = position.getRow();
         return String.format("%c%d", file, rank);
     }
-
 
     @Override
     public void handleClose(WsCloseContext ctx) {
