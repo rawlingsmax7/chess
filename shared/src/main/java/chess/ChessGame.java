@@ -16,6 +16,7 @@ public class ChessGame {
     private TeamColor teamTurn;
     private ChessBoard board = new ChessBoard();
     private ChessPosition enPassantTarget = null; // this is where you would move your piece if you want to initiate an enPassant move
+    private boolean gameOver = false;
 
     // castling fields
     private boolean blackKingUnmoved = true;
@@ -445,6 +446,14 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board) {
         this.board = board;
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver() {
+        gameOver = true;
     }
 
     /**
