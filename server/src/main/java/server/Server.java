@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.*;
 import io.javalin.Javalin;
 import requests.*;
+import server.websocket.WebSocketHandler;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
@@ -28,6 +29,8 @@ public class Server {
         ClearService clearService = new ClearService(userDao, gameDao, authDao);
         UserService userService = new UserService(userDao, authDao);
         GameService gameService = new GameService(gameDao, authDao);
+
+        WebSocketHandler webSocketHandler = new WebSocketHandler(gameDao, authDao);
 
         Gson gson = new Gson();
 
@@ -93,6 +96,13 @@ public class Server {
             JoinRequest request = gson.fromJson(ctx.body(), JoinRequest.class);
             JoinResult result = gameService.joinGame(authToken, request);
             ctx.result(gson.toJson(result));
+        });
+
+        // websocket endpoint
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(webSocketHandler);
+            ws.onMessage(webSocketHandler);
+            ws.onClose(webSocketHandler);
         });
     }
 
