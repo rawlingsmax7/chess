@@ -59,7 +59,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 case MAKE_MOVE -> makeMove(session, username,
                         gson.fromJson(wsMessageContext.message(), MakeMoveCommand.class));
                 case LEAVE -> leaveGame(session, username, command);
-//                case RESIGN -> resign(session, username, command);
+                case RESIGN -> resign(session, username, command);
             }
         } catch (UnauthorizedException ex) {
             sendMessage(session, new ErrorMessage("Error: unauthorized"));
@@ -69,16 +69,38 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-//    private void resign(Session session, String username, UserGameCommand command) throws DataAccessException, IOException {
-//        int gameID = command.getGameID();
-//        GameData gameData = gameDao.getGame(gameID);
-//
-//        if (gameData == null) {
-//            sendMessage(session, new ErrorMessage("Error: game ID bad"));
-//            return;
-//        }
-//        ChessGame.TeamColor role = getRole(username, gameData);
-//    }
+    private void resign(Session session, String username, UserGameCommand command) throws DataAccessException, IOException {
+        int gameID = command.getGameID();
+        GameData gameData = gameDao.getGame(gameID);
+
+        if (gameData == null) {
+            sendMessage(session, new ErrorMessage("Error: game ID bad"));
+            return;
+        }
+        ChessGame.TeamColor role = getRole(username, gameData);
+        ChessGame chessGame = gameData.game();
+
+        // if it's an observer then you can't resign, need to be one of the players
+        if (role == null) {
+            sendMessage(session, new ErrorMessage("Error: observers can't resign"));
+            return;
+        }
+        // game is already over you cant resign
+        if (chessGame.isGameOver()) {
+            sendMessage(session, new ErrorMessage("Error: Game is already over"));
+            return;
+        }
+
+        chessGame.setGameOver();
+
+        // update game in database after setting it to game over
+        gameDao.updateGame(gameData);
+
+        // Server sends a Notification message to all clients in that game informing them
+        // that the root client resigned. This applies to both players and observers.
+        String broadcastMessage = username + " resigned as " + role;
+        connections.broadcast(gameID, null, new NotificationMessage(broadcastMessage));
+    }
 
     private void leaveGame(Session session, String username, UserGameCommand command) throws DataAccessException, IOException {
         int gameID = command.getGameID();
