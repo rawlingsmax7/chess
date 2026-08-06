@@ -198,23 +198,26 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         // If the move results in check, checkmate or stalemate the server sends a Notification
         // message to all clients.
         // Checkmate, then Stalemate, then Check
+        String whiteUsername = gameData.whiteUsername();
+        String blackUsername = gameData.blackUsername();
+
         if (chessGame.isInCheckmate(ChessGame.TeamColor.WHITE)) {
-            String broadcastMessage = "WHITE is in Checkmate. BLACK wins.";
+            String broadcastMessage = String.format("%s is in Checkmate. %s wins.", whiteUsername, blackUsername);
             connections.broadcast(gameID, null, new NotificationMessage(broadcastMessage));
         } else if (chessGame.isInCheckmate(ChessGame.TeamColor.BLACK)) {
-            String broadcastMessage = "BLACK is in Checkmate. WHITE wins.";
+            String broadcastMessage = String.format("%s is in Checkmate. %s wins.", blackUsername, whiteUsername);
             connections.broadcast(gameID, null, new NotificationMessage(broadcastMessage));
         } else if (chessGame.isInStalemate(ChessGame.TeamColor.WHITE)) {
-            String broadcastMessage = "WHITE is in Stalemate. Tie game.";
+            String broadcastMessage = String.format("%s is in Stalemate. Tie game.", whiteUsername);
             connections.broadcast(gameID, null, new NotificationMessage(broadcastMessage));
         } else if (chessGame.isInStalemate(ChessGame.TeamColor.BLACK)) {
-            String broadcastMessage = "BLACK is in Stalemate. Tie game.";
+            String broadcastMessage = String.format("%s is in Stalemate. Tie game.", blackUsername);
             connections.broadcast(gameID, null, new NotificationMessage(broadcastMessage));
         } else if (chessGame.isInCheck(ChessGame.TeamColor.WHITE)) {
-            String broadcastMessage = "WHITE is in Check.";
+            String broadcastMessage = String.format("%s is in Check.", whiteUsername);
             connections.broadcast(gameID, null, new NotificationMessage(broadcastMessage));
         } else if (chessGame.isInCheck(ChessGame.TeamColor.BLACK)) {
-            String broadcastMessage = "BLACK is in Check.";
+            String broadcastMessage = String.format("%s is in Check.", blackUsername);
             connections.broadcast(gameID, null, new NotificationMessage(broadcastMessage));
         }
     }
