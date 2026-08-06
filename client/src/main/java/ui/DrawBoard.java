@@ -7,6 +7,8 @@ import chess.ChessPosition;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Set;
 
 import static ui.EscapeSequences.*;
 
@@ -19,6 +21,9 @@ public class DrawBoard {
 
     private ChessBoard board;
     private PrintStream output;
+
+    private Collection<ChessPosition> highlights = Set.of();
+    private ChessPosition selectedPosition = null;
 
     public DrawBoard(ChessBoard board, PrintStream output) {
         this.board = board;
@@ -44,6 +49,13 @@ public class DrawBoard {
 
         output.print(RESET_BG_COLOR);
         output.print(RESET_TEXT_COLOR);
+    }
+
+    public void draw(boolean whitePerspective, Collection<ChessPosition> highlights,
+                     ChessPosition selectedPosition) {
+        this.highlights = highlights;
+        this.selectedPosition = selectedPosition;
+        draw(whitePerspective);
     }
 
     private void drawTopHeaders(boolean whitePerspective) {
@@ -111,11 +123,25 @@ public class DrawBoard {
             // change the starting column depending on if we are drawing in white or black's
             // perspective
             int col = whitePerspective ? (i + 1) : (BOARD_SIZE_IN_SQUARES - i);
-            if ((row + col) % 2 == 0) {
-                setDarkSquare();
+
+            ChessPosition position = new ChessPosition(row, col);
+            // if the position should be highlighted just do that in green
+            if (position.equals(selectedPosition)) {
+                setYellowSquare();
+            } else if (highlights.contains(position)) {
+                if ((row + col) % 2 == 0) {
+                    setDarkGreenSquare();
+                } else {
+                    setLightGreenSquare();
+                }
             } else {
-                setLightSquare();
+                if ((row + col) % 2 == 0) {
+                    setDarkSquare();
+                } else {
+                    setLightSquare();
+                }
             }
+
 
             ChessPiece piece = board.getPiece(new ChessPosition(row, col));
             if (piece == null) {
@@ -124,7 +150,7 @@ public class DrawBoard {
                 printPiece(piece);
             }
         }
-        
+
         setBlack();
         drawHeader(String.valueOf(row));
         output.print(RESET_BG_COLOR);
@@ -163,6 +189,18 @@ public class DrawBoard {
 
     private void setDarkSquare() {
         output.print(SET_BG_COLOR_DARK_GREY);
+    }
+
+    private void setLightGreenSquare() {
+        output.print(SET_BG_COLOR_GREEN);
+    }
+
+    private void setDarkGreenSquare() {
+        output.print(SET_BG_COLOR_DARK_GREEN);
+    }
+
+    private void setYellowSquare() {
+        output.print(SET_BG_COLOR_YELLOW);
     }
 
     // black background for the header row/column (kept separate from the squares)

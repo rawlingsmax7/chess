@@ -18,6 +18,9 @@ import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class GameplayClient extends LoginClient implements ServerMessageObserver {
 
@@ -40,6 +43,12 @@ public class GameplayClient extends LoginClient implements ServerMessageObserver
         PrintStream output = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         ChessBoard board = currentGame.getBoard();
         new DrawBoard(board, output).draw(whitePerspective);
+    }
+
+    private void printBoard(Collection<ChessPosition> highlights, ChessPosition selectedPosition) {
+        PrintStream output = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        ChessBoard board = currentGame.getBoard();
+        new DrawBoard(board, output).draw(whitePerspective, highlights, selectedPosition);
     }
 
     @Override
@@ -110,7 +119,29 @@ public class GameplayClient extends LoginClient implements ServerMessageObserver
                         return "Resign cancelled.";
                     }
                 case "highlight":
-                    //
+                    if (params.length < 1) {
+                        return "Expected: highlight <letter><number>  ex: highlight e4";
+                    }
+                    String squareToHighlight = params[0].toLowerCase();
+                    if (!isValidPosition(squareToHighlight)) {
+                        return "Squares must be between a1 and h8. Ex: highlight e4";
+                    }
+
+                    // make sure you can highlight that move
+                    ChessPosition position = squareToPosition(squareToHighlight);
+                    Collection<ChessMove> possibleMoves = currentGame.validMoves(position);
+
+                    if (possibleMoves == null || possibleMoves.isEmpty()) {
+                        return "No legal moves for that square.";
+                    }
+                    Set<ChessPosition> positionsToHighlight = new HashSet<>();
+                    for (ChessMove possibleMove : possibleMoves) {
+                        positionsToHighlight.add(possibleMove.getEndPosition());
+                    }
+
+                    printBoard(positionsToHighlight, position);
+                    return "";
+
                 default:
                     return printHelp();
             }
