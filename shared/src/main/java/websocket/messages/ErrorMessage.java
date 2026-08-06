@@ -13,7 +13,7 @@ public class ErrorMessage extends ServerMessage {
         this.errorMessage = errorMessage;
     }
 
-    public String getErrorMessage() {
+    public String getMessage() {
         return errorMessage;
     }
 
@@ -33,4 +33,5 @@ public class ErrorMessage extends ServerMessage {
     public int hashCode() {
         return Objects.hash(super.hashCode(), errorMessage);
     }
+
 }

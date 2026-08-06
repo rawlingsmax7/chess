@@ -4,13 +4,13 @@ import java.util.Scanner;
 
 public abstract class LoginClient {
     protected final ServerFacade facade;
+    protected final Scanner scanner = new Scanner(System.in);
 
     protected LoginClient(ServerFacade facade) {
         this.facade = facade;
     }
 
     public void run() {
-        Scanner scanner = new Scanner(System.in);
         var result = "";
         while (!result.equals("quit")) {
             System.out.print(prompt());

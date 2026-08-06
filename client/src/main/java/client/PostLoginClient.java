@@ -109,6 +109,8 @@ public class PostLoginClient extends LoginClient {
                 case 403 -> "That color is already taken.";
                 default -> "Something went wrong. Please try again.";
             };
+        } catch (Exception e) {
+            return "Couldn't connect to game. Try again.";
         }
     }
 
