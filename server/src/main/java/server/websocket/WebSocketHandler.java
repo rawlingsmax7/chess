@@ -173,7 +173,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             return;
         }
 
-        if (chessGame.isInCheckmate(ChessGame.TeamColor.WHITE) || chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) || chessGame.isInStalemate(ChessGame.TeamColor.WHITE) || chessGame.isInStalemate(ChessGame.TeamColor.BLACK)) {
+        if (chessGame.isInCheckmate(ChessGame.TeamColor.WHITE) ||
+                chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) ||
+                chessGame.isInStalemate(ChessGame.TeamColor.WHITE) ||
+                chessGame.isInStalemate(ChessGame.TeamColor.BLACK)) {
             chessGame.setGameOver();
         }
 
